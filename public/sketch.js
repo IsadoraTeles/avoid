@@ -108,9 +108,7 @@ function updateColorPosition(tc, ta) {
 
 function sendMyData(color, position, size) {
     var data = {
-        r: color.r,
-        g: color.g,
-        b: color.b,
+        color: color,
         x: position.x,
         y: position.y,
         w: size.x,
@@ -128,8 +126,9 @@ function drawMe(color, position, size) {
 }
 
 function drawOthers(data) {
-    fill(data[0], data[1], data[2]);
-    ellipse(data[3], data[4], data[5], data[6]);
+    colorMode(HSB);
+    fill(data.color, 100, 100);
+    ellipse(data.x, data.y, data.w, data.h);
 }
 
 function assignColor() {
