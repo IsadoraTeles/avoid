@@ -1,4 +1,17 @@
-// ***SERVER***
+// *** SERVER *** //
+
+var blobs = []; // all of the blobs that are currently connected
+
+// CONSTRUCTION FUNCTION
+function Blob(id, color, x, y, s) {
+    this.id = id;
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.s = s;
+}
+
+
 // variable that stores a function call
 var express = require('express');
 const app = express();
@@ -13,19 +26,54 @@ app.use(express.static('public'));
 let socket = require('socket.io');
 let io = socket(server);
 
+setInterval(heartbeat, 33);
+
+function heartbeat() {
+    io.sockets.emit('heartbeat', blobs); // message with array
+}
+
 // EVENT NEW CONNECTION
+// callback function to run when we hahve a new
+// individual connection
 io.sockets.on('connection', newConnection);
 
 // ON NEW CONNECTION
 function newConnection(socket) {
     console.log('new connection : ' + socket.id);
 
-    socket.on('clientData', clientMsg);
+    // CREATE NEW BLOB OBJECT
+    socket.on('start', start)
+    function start(data) {
+        console.log(socket.id + ' ' + data.color + ' ' + data.x + ' ' + data.y + ' ' + data.s);
 
-    function clientMsg(data) {
-        socket.broadcast.emit('clientData', data);
-        // io.sockets.emit('clientData', data); // also includes client that sent the message
-        console.log(data);
+        // list of connected clients
+        var blob = new Blob(socket.id, data.color, data.x, data.y, data.s);
+        blobs.push(blob);
     }
+
+    // UPDATE THE ARRAY OF BLOBS
+    socket.on('update', clientMsg);
+    function clientMsg(data) {
+        var blob;
+        for (var i = 0; i < blobs.length; i++) {
+            if (socket.id == blobs[i].id) {
+                blob = blobs[i];
+            }
+        }
+
+        // UPDATE BLOB PROPERTIES
+        blob.color = data.color;
+        blob.x = data.x;
+        blob.y = data.y;
+        blob.s = data.s;
+    }
+
+    socket.on('disconect', function () {
+        console.log('Console has disconected');
+    });
+    //socket.broadcast.emit('update', data);
+    // io.sockets.emit('clientData', data); // also includes client that sent the message
+    //console.log(data);
 }
+
 

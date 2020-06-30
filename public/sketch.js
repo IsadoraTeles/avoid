@@ -1,27 +1,33 @@
+// *** CLIENT *** //
 
-// VARIABLES 
-// SOCKET
-//const port = process.env.PORT || 3000;
+// ***OBJECTS*** //
+// BLOBS
+var blob; // me
+var blobs = []; // others
+// SOCKETs
+// const port = process.env.PORT || 3000;
 let socket;
-
 // VIDEO CAPTURE
 let captureClient;
+
+// ***VARIABLES*** //
+// video
 var w = 320;
 var h = 240;
 var targetColor = [255, 0, 0];
 var thresholdAmount = 206.55;
 
-// DRAWING PARAMETERS
+// drawing
 let myColor;
 var myPosition;
 var mySize;
-
+var myId;
 
 function setup() {
 
     myColor = random(360);
     myPosition = createVector(0, 0);
-    mySize = createVector(10, 10);
+    mySize = 10;
 
     // STEUP CANVAS
     createCanvas(w, h);
@@ -30,32 +36,68 @@ function setup() {
     // SETUP SOCKETS
     socket = io.connect();
     // Draw client on canvas
-    socket.on('clientData', drawOthers);
+    //socket.on('clientData', drawOthers);
 
     // VIDEO DRAW
     setupVideoDraw(w, h);
 
-    // SETUP MY PROPERTIES
+    // ME
+    blob = new Blob(myColor, myPosition.x, myPosition.y, mySize);
+    var data = {
+        color: blob.color,
+        x: blob.x,
+        y: blob.y,
+        s: blob.s
+    }
+    socket.emit('start', data);
 
+    socket.on('heartbeat', function (data) {
+        blobs = data; // update other blobs
+    });
 
 }
 
 function draw() {
 
-    // update color
-
-    // update sound
-
-    // update color position form video
+    background(0);
+    // update color, position and size from video
     myPosition = updateColorPosition(targetColor, thresholdAmount);
-    drawMe(myColor, myPosition, mySize);
+    // update my blob
+    blob.color = myColor;
+    blob.x = myPosition.x;
+    blob.y = myPosition.y;
+    blob.s = mySize;
 
-    // SOCKET SEND POSITION
-    sendMyData(myColor, myPosition, mySize);
+    // draw others
+    for (var i = blobs.length - 1; i >= 0; i--) {
+        var id = blobs[i].id;
+        // I DONT WANT TO DRAW MYSELF ??
+        if (id.substring(2, id.length) !== socket.id) {
+            colorMode(HSB);
+            fill(blobs[i].color, 100, 100);
+            ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
+
+            fill(255);
+            textAlign(CENTER);
+            textSize(4);
+            text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].s);
+        }
+    }
+
+    // draw me and send an 'update' data
+    blob.drawBlob();
+
+    var data = {
+        color: blob.color,
+        x: blob.x,
+        y: blob.y,
+        s: blob.s
+    };
+    socket.emit('update', data);
 
 }
 
-// ***VIDEO DRAW*** //
+// *** VIDEO DRAW *** //
 function setupVideoDraw(width, height) {
     captureClient = createCapture(VIDEO);
     captureClient.size(width, height);
@@ -103,46 +145,14 @@ function updateColorPosition(tc, ta) {
         captureClient.updatePixels();
     }
 
+    /*
+    var c = blob.color;
+    colorMode(HSB);
+    fill(c, 100, 100);
+    ellipse(sumPosition.x, sumPosition.y, blob.size, blob.size);
+*/
+
     return sumPosition;
 }
 
-function sendMyData(color, position, size) {
-    var data = {
-        color: color,
-        x: position.x,
-        y: position.y,
-        w: size.x,
-        h: size.y
-    }
 
-    socket.emit('clientData', data);
-
-}
-
-function drawMe(color, position, size) {
-    colorMode(HSB);
-    fill(color, 100, 100);
-    ellipse(position.x, position.y, size.x, size.y);
-}
-
-function drawOthers(data) {
-    colorMode(HSB);
-    fill(data.color, 100, 100);
-    ellipse(data.x, data.y, data.w, data.h);
-}
-
-function assignColor() {
-
-}
-
-function updateColor() {
-
-}
-
-function assignSound() {
-
-}
-
-function updateSound() {
-
-}
