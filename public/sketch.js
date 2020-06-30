@@ -72,20 +72,23 @@ function draw() {
     for (var i = blobs.length - 1; i >= 0; i--) {
         var id = blobs[i].id;
         // I DONT WANT TO DRAW MYSELF ??
-        if (id.substring(2, id.length) !== socket.id) {
+        if (id !== socket.id) {
             colorMode(HSB);
             fill(blobs[i].color, 100, 100);
             ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
 
             fill(255);
             textAlign(CENTER);
-            textSize(4);
+            textSize(12);
             text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].s);
         }
     }
 
     // draw me and send an 'update' data
-    blob.drawBlob();
+    blob.drawBlob(); fill(255);
+    textAlign(CENTER);
+    textSize(12);
+    text(socket.id, blob.x, blob.y + blob.s);
 
     var data = {
         color: blob.color,

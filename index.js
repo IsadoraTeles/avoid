@@ -37,6 +37,7 @@ function heartbeat() {
 // individual connection
 io.sockets.on('connection', newConnection);
 
+
 // ON NEW CONNECTION
 function newConnection(socket) {
     console.log('new connection : ' + socket.id);
@@ -68,12 +69,23 @@ function newConnection(socket) {
         blob.s = data.s;
     }
 
-    socket.on('disconect', function () {
-        console.log('Console has disconected');
-    });
+    socket.on('disconect', () => {
+
+        blobs.forEach((blob) => {
+            if (blob.id === socket.id) {
+                for (const key in blob) {
+                    console.log('user ' + socket.id + 'has diconnected');
+                    delete blob[key];
+                }
+            }
+        })
+    })
+
+}
+
     //socket.broadcast.emit('update', data);
     // io.sockets.emit('clientData', data); // also includes client that sent the message
     //console.log(data);
-}
+
 
 
