@@ -68,18 +68,19 @@ function newConnection(socket) {
         blob.y = data.y;
         blob.s = data.s;
     }
-
-    socket.on('disconect', () => {
-
-        blobs.forEach((blob) => {
-            if (blob.id === socket.id) {
-                for (const key in blob) {
-                    console.log('user ' + socket.id + 'has diconnected');
-                    delete blob[key];
+    /*
+        socket.on('disconect', () => {
+    
+            blobs.forEach((blob) => {
+                if (blob.id === socket.id) {
+                    for (const key in blob) {
+                        console.log('user ' + socket.id + 'has diconnected');
+                        delete blob[key];
+                    }
                 }
-            }
+            })
         })
-    })
+        */
 
 }
 
