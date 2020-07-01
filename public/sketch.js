@@ -155,6 +155,7 @@ function draw() {
                     fill(blobs[i].color, 100, 100);
                     ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
 
+
                     fill(255);
                     textAlign(CENTER);
                     textSize(12);
