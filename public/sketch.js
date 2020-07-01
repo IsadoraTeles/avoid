@@ -1,3 +1,24 @@
+
+// *** SOUNDS *** //
+let carrier; // this is the oscillator we will hear
+let modulator; // this oscillator will modulate the frequency of the carrier
+var moyeneDistances;
+var moyenneX;
+var moyenneY;
+var numBlobs;
+
+// the carrier frequency pre-modulation
+let carrierBaseFreq = 220;
+
+// min/max ranges for modulator
+let modMaxFreq = 112;
+let modMinFreq = 0;
+let modMaxDepth = 150;
+let modMinDepth = -150;
+
+var button;
+var playing = false;
+
 // *** CLIENT *** //
 var giuPosition;
 var gTarget = [255, 0, 0]; // RED
@@ -26,6 +47,17 @@ var myDistance;
 var isGiuseppe;
 
 function setup() {
+
+    carrier = new p5.Oscillator('sine');
+
+    // try changing the type to 'square', 'sine' or 'triangle'
+    modulator = new p5.Oscillator('sawtooth');
+
+
+    button = createButton('play/pause');
+    button.mousePressed(toggle);
+
+    ///////
 
     giuPosition = createVector(0, 0);
 
@@ -60,11 +92,14 @@ function setup() {
     socket.emit('start', data);
 
     socket.on('heartbeat', function (data) {
+
         blobs = data; // update other blobs
+
     });
 }
 
 function draw() {
+
 
     background(0);
 
@@ -76,10 +111,16 @@ function draw() {
     blob.d = myDistance;
     blob.ig = isGiuseppe;
 
+
     // IF IM NOT GIUSEPPE
     if (isGiuseppe == false) {
 
         myPosition = updateColorPosition(targetColor, thresholdAmount);
+
+        moyeneDistances = 0;
+        moyenneX = 0;
+        moyenneY = 0;
+        numBlobs = 0;
 
         // draw others
         for (var i = blobs.length - 1; i >= 0; i--) {
@@ -104,6 +145,8 @@ function draw() {
                     textAlign(CENTER);
                     textSize(12);
                     text('GIUSEPPE', blobs[0].x, blobs[0].y - 20);
+
+
                 }
 
                 // OTHERS THEN ME OR GIUSEPPE
@@ -116,8 +159,24 @@ function draw() {
                     textAlign(CENTER);
                     textSize(12);
                     text(blobs[i].d, blobs[i].x, blobs[i].y);
+
                 }
             }
+
+            moyeneDistances = (moyeneDistances + blobs[i].d) / blobs.length;
+            moyenneX = (moyenneX + blobs[i].x) / blobs.length;
+            moyenneY = (moyenneY + blobs[i].y) / blobs.length;
+
+            // map mouseY to modulator freq between a maximum and minimum frequency
+            let modFreq = map(moyeneDistances, 30, 300, modMinFreq, modMaxFreq);
+            modulator.freq(modFreq);
+
+            // change the amplitude of the modulator
+            // negative amp reverses the sawtooth waveform, and sounds percussive
+            //
+            let modDepth = map(moyenneX, 0, width, modMinDepth, modMaxDepth);
+            modulator.amp(modDepth);
+
 
             // IF I AM GIUSEPPE
             if (blobs[0].id == socket.id && isGiuseppe == false) {
@@ -150,6 +209,11 @@ function draw() {
         myPosition = updateColorPosition(gTarget, thresholdAmount);
         //giuPosition = (myPosition.x, myPosition.y);
 
+        moyeneDistances = 0;
+        moyenneX = 0;
+        moyenneY = 0;
+        numBlobs = 0;
+
         for (var i = blobs.length - 1; i >= 0; i--) {
 
             var id = blobs[i].id;
@@ -167,8 +231,21 @@ function draw() {
                 textAlign(CENTER);
                 textSize(12);
                 text(blobs[i].d, blobs[i].x, blobs[i].y);
-
             }
+
+            moyeneDistances = (moyeneDistances + blobs[i].d) / blobs.length;
+            moyenneX = (moyenneX + blobs[i].x) / blobs.length;
+            moyenneY = (moyenneY + blobs[i].y) / blobs.length;
+
+            // map mouseY to modulator freq between a maximum and minimum frequency
+            let modFreq = map(moyenneY, height, 0, modMinFreq, modMaxFreq);
+            modulator.freq(modFreq);
+
+            // change the amplitude of the modulator
+            // negative amp reverses the sawtooth waveform, and sounds percussive
+            //
+            let modDepth = map(moyenneX, 0, width, modMinDepth, modMaxDepth);
+            modulator.amp(modDepth);
         }
 
         ////////
@@ -193,7 +270,6 @@ function draw() {
         };
         socket.emit('update', data);
         /////////
-
     }
 
 }
@@ -254,6 +330,27 @@ function updateColorPosition(tc, ta) {
 */
 
     return sumPosition;
+}
+
+function toggle() {
+    if (!playing) {
+        carrier.amp(1.0, 0.01);
+        carrier.freq(carrierBaseFreq); // set frequency
+        carrier.start(); // start oscillating
+
+        modulator.start();
+
+        // add the modulator's output to modulate the carrier's frequency
+        modulator.disconnect();
+        carrier.freq(modulator);
+
+        playing = true;
+    } else {
+
+        carrier.amp(0.0, 1.0);
+
+        playing = false;
+    }
 }
 
 
