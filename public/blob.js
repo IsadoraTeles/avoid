@@ -1,10 +1,12 @@
 // VECTOR OBJECT
 
-function Blob(color, x, y, s) {
+function Blob(color, x, y, s, d, isGiuseppe) {
     this.color = color;
     this.x = x;
     this.y = y;
     this.s = s;
+    this.d = d;
+    var ig = isGiuseppe;
 
     this.drawBlob = function () {
         colorMode(HSB);

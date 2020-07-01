@@ -1,5 +1,6 @@
 // *** CLIENT *** //
-
+var giuPosition;
+var gTarget = [255, 0, 0]; // RED
 // ***OBJECTS*** //
 // BLOBS
 var blob; // me
@@ -14,20 +15,25 @@ let captureClient;
 // video
 var w = 320;
 var h = 240;
-var targetColor = [255, 0, 0];
+var targetColor = [0, 0, 255]; // BLUE
 var thresholdAmount = 206.55;
 
 // drawing
 let myColor;
 var myPosition;
 var mySize;
-var myId;
+var myDistance;
+var isGiuseppe;
 
 function setup() {
+
+    giuPosition = createVector(0, 0);
 
     myColor = random(360);
     myPosition = createVector(0, 0);
     mySize = 10;
+    myDistance = 0;
+    isGiuseppe = false;
 
     // STEUP CANVAS
     createCanvas(w, h);
@@ -42,61 +48,153 @@ function setup() {
     setupVideoDraw(w, h);
 
     // ME
-    blob = new Blob(myColor, myPosition.x, myPosition.y, mySize);
+    blob = new Blob(myColor, myPosition.x, myPosition.y, mySize, myDistance, isGiuseppe);
     var data = {
         color: blob.color,
         x: blob.x,
         y: blob.y,
-        s: blob.s
+        s: blob.s,
+        d: blob.d,
+        ig: isGiuseppe
     }
     socket.emit('start', data);
 
     socket.on('heartbeat', function (data) {
         blobs = data; // update other blobs
     });
-
 }
 
 function draw() {
 
     background(0);
-    // update color, position and size from video
-    myPosition = updateColorPosition(targetColor, thresholdAmount);
+
     // update my blob
     blob.color = myColor;
     blob.x = myPosition.x;
     blob.y = myPosition.y;
     blob.s = mySize;
+    blob.d = myDistance;
+    blob.ig = isGiuseppe;
 
-    // draw others
-    for (var i = blobs.length - 1; i >= 0; i--) {
-        var id = blobs[i].id;
-        // I DONT WANT TO DRAW MYSELF ??
-        if (id !== socket.id) {
-            colorMode(HSB);
-            fill(blobs[i].color, 100, 100);
-            ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
+    // IF IM NOT GIUSEPPE
+    if (isGiuseppe == false) {
 
-            fill(255);
-            textAlign(CENTER);
-            textSize(12);
-            text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].s);
+        myPosition = updateColorPosition(targetColor, thresholdAmount);
+
+        // draw others
+        for (var i = blobs.length - 1; i >= 0; i--) {
+            var id = blobs[i].id;
+
+            // IF ITS NOT ME
+            if (id !== socket.id) {
+
+                // IF ITS GIUSEPPE and giuseppe is not me
+                if (i == 0) {
+
+                    blobs[0].color = 0;
+                    blobs[0].s = 30;
+                    blobs[0].d = 0;
+
+                    myDistance = dist(myPosition.x, myPosition.y, blobs[0].x, blobs[0].y);
+
+                    colorMode(HSB);
+                    fill(blobs[0].color, 100, 100);
+                    ellipse(blobs[0].x, blobs[0].y, blobs[0].s, blobs[0].s);
+                    fill(255);
+                    textAlign(CENTER);
+                    textSize(12);
+                    text('GIUSEPPE', blobs[0].x, blobs[0].y - 20);
+                }
+
+                // OTHERS THEN ME OR GIUSEPPE
+                else if (i > 0) {
+                    colorMode(HSB);
+                    fill(blobs[i].color, 100, 100);
+                    ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
+
+                    fill(255);
+                    textAlign(CENTER);
+                    textSize(12);
+                    text(blobs[i].d, blobs[i].x, blobs[i].y);
+                }
+            }
+
+            // IF I AM GIUSEPPE
+            if (blobs[0].id == socket.id && isGiuseppe == false) {
+                isGiuseppe = true; // created giuseppe on first connected
+            }
         }
+
+        ////////////
+        blob.drawBlob();
+
+        fill(255);
+        textAlign(CENTER);
+        textSize(12);
+        text(blob.d, blob.x, blob.y + blob.s);
+
+        var data = {
+            color: blob.color,
+            x: blob.x,
+            y: blob.y,
+            s: blob.s,
+            d: blob.d,
+            ig: false
+        };
+        socket.emit('update', data);
+        ////////////
     }
 
-    // draw me and send an 'update' data
-    blob.drawBlob(); fill(255);
-    textAlign(CENTER);
-    textSize(12);
-    text(socket.id, blob.x, blob.y + blob.s);
+    if (isGiuseppe) {
 
-    var data = {
-        color: blob.color,
-        x: blob.x,
-        y: blob.y,
-        s: blob.s
-    };
-    socket.emit('update', data);
+        myPosition = updateColorPosition(gTarget, thresholdAmount);
+        //giuPosition = (myPosition.x, myPosition.y);
+
+        for (var i = blobs.length - 1; i >= 0; i--) {
+
+            var id = blobs[i].id;
+            // IF ITS NOT ME
+            if (id !== socket.id) {
+
+                colorMode(HSB);
+                fill(blobs[i].color, 100, 100);
+                ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
+
+                // updating other's distance from me
+                blobs[i].d = dist(blobs[i].x, blobs[i].y, myPosition.x, myPosition.y);
+
+                fill(255);
+                textAlign(CENTER);
+                textSize(12);
+                text(blobs[i].d, blobs[i].x, blobs[i].y);
+
+            }
+        }
+
+        ////////
+        blob.color = 0;
+        blob.s = 30;
+        blob.d = 0;
+
+        blob.drawBlob();
+
+        fill(255);
+        textAlign(CENTER);
+        textSize(12);
+        text('GIUSEPPE', blob.x, blob.y - 20);
+
+        var data = {
+            color: blob.color,
+            x: blob.x,
+            y: blob.y,
+            s: blob.s,
+            d: blob.d,
+            ig: true
+        };
+        socket.emit('update', data);
+        /////////
+
+    }
 
 }
 

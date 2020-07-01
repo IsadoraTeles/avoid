@@ -3,12 +3,14 @@
 var blobs = []; // all of the blobs that are currently connected
 
 // CONSTRUCTION FUNCTION
-function Blob(id, color, x, y, s) {
+function Blob(id, color, x, y, s, d, ig) {
     this.id = id;
     this.color = color;
     this.x = x;
     this.y = y;
     this.s = s;
+    this.d = d;
+    this.ig = ig;
 }
 
 
@@ -48,7 +50,7 @@ function newConnection(socket) {
         console.log(socket.id + ' ' + data.color + ' ' + data.x + ' ' + data.y + ' ' + data.s);
 
         // list of connected clients
-        var blob = new Blob(socket.id, data.color, data.x, data.y, data.s);
+        var blob = new Blob(socket.id, data.color, data.x, data.y, data.s, data.d, data.ig);
         blobs.push(blob);
     }
 
@@ -67,6 +69,8 @@ function newConnection(socket) {
         blob.x = data.x;
         blob.y = data.y;
         blob.s = data.s;
+        blob.d = data.d;
+        blob.ig = data.ig;
     }
     /*
         socket.on('disconect', () => {
