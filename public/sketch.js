@@ -6,11 +6,6 @@ var giuBumpedOtherSound;
 
 var wave;
 
-//var randomSound;
-//var sfx = [];
-//var sfx1, sfx2, sf3, sfx4, sfx5;
-//var alerts = [10];
-
 var button;
 var playing = false;
 
@@ -22,7 +17,6 @@ var gTarget = [255, 0, 0]; // RED
 var blob; // me
 var blobs = []; // others
 // SOCKETs
-// const port = process.env.PORT || 3000;
 let socket;
 // VIDEO CAPTURE
 let captureClient;
@@ -50,12 +44,9 @@ function preload() {
     bumpedGiuseppeSound = loadSound('sounds/Alert/1.mp3');
     giuBumpedOtherSound = loadSound('sounds/Alert/8.mp3');
 
-
     sfx1 = loadSound('sounds/Alert/0.mp3');
     sfx2 = loadSound('sounds/Alert/2.mp3');
     sfx3 = loadSound('sounds/Woosh/3.mp3');
-
-    sfx = [sfx1, sfx2, sf3, sfx4, sfx5];
 
 }
 
@@ -91,12 +82,9 @@ function setup() {
 
     // STEUP CANVAS
     createCanvas(w, h);
-    //background(0);
 
     // SETUP SOCKETS
     socket = io.connect();
-    // Draw client on canvas
-    //socket.on('clientData', drawOthers);
 
     // VIDEO DRAW
     setupVideoDraw(w, h);
@@ -313,10 +301,10 @@ function draw() {
 
             // WHEN GIUSEPPE BUMPS OTHERS
             if (blobs[i].d < 30) {
+                //bumpedGiuseppe = true;
                 giuBumpedOther = true;
                 blob.bo = true;
-
-                var ran = round(random(2));
+                blobs[i].bg = true;
 
                 giuBumpedOtherSound.play();
                 giuBumpedOtherSound.amp(a, 0.1);
@@ -327,16 +315,12 @@ function draw() {
 
             if (blobs[i].bo) {
 
-                //randomSound.play();
-
                 var a = map(blobs[i].y, 0, height, 0, 0.5);
 
                 bumpedOtherSound.play();
                 bumpedOtherSound.amp(a, 0.1);
-                //randomSound.amp(1, 0.1);
             }
             else {
-                //randomSound.amp(0, 0.1);
                 bumpedOtherSound.amp(0, 0.1);
             }
 
