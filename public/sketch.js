@@ -323,11 +323,6 @@ function draw() {
             }
             else { giuBumpedOtherSound.amp(0, 0.3); }
 
-            fill(255);
-            textAlign(CENTER);
-            textSize(12);
-            text(blobs[i].d, blobs[i].x, blobs[i].y);
-
             var ran = round(random(2));
 
             if (blobs[i].bo) {
@@ -366,6 +361,11 @@ function draw() {
                 }
 
             }
+
+            fill(255);
+            textAlign(CENTER);
+            textSize(12);
+            text(blobs[i].d, blobs[i].x, blobs[i].y);
 
         }
 
