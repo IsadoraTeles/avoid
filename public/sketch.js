@@ -189,42 +189,26 @@ function draw() {
 
                     ///////////
 
-                    var ran = round(random(2));
-
                     if (blobs[i].bo) {
-
-                        //randomSound.play();
 
                         var a = map(blobs[i].y, 0, height, 0, 0.5);
 
                         bumpedOtherSound.play();
                         bumpedOtherSound.amp(a, 0.1);
-                        //randomSound.amp(1, 0.1);
                     }
                     else {
-                        //randomSound.amp(0, 0.1);
                         bumpedOtherSound.amp(0, 0.1);
                     }
 
                     if (blobs[i].bg) {
 
-                        if (ran == 2) {
-                            bumpedGiuseppeSound.play();
-                            bumpedGiuseppeSound.amp(a, 0.1);
-                        } else {
-                            sfx1.play();
-                            sfx1.amp(a, 0.1);
-                        }
+                        bumpedGiuseppeSound.play();
+                        bumpedGiuseppeSound.amp(a, 0.1);
 
                     }
                     else {
 
-                        if (ran == 2) {
-                            bumpedGiuseppeSound.amp(0, 0.2);
-
-                        } else {
-                            sfx1.amp(0, 0.2);
-                        }
+                        bumpedGiuseppeSound.amp(0, 0.2);
 
                     }
                 }
@@ -234,23 +218,14 @@ function draw() {
 
                     var a = map(myPosition.y, 0, height, 0, 0.5);
 
-                    if (ran == 1) {
-                        bumpedGiuseppeSound.play();
-                        bumpedGiuseppeSound.amp(a, 0.1);
-                    } else {
-                        sfx1.play();
-                        sfx1.amp(a, 0.1);
-                    }
+
+                    bumpedGiuseppeSound.play();
+                    bumpedGiuseppeSound.amp(a, 0.1);
 
                 }
                 else {
 
-                    if (ran == 1) {
-                        bumpedGiuseppeSound.amp(0, 0.2);
-
-                    } else {
-                        sfx1.amp(0, 0.2);
-                    }
+                    bumpedGiuseppeSound.amp(0, 0.2);
 
                 }
 
@@ -300,46 +275,47 @@ function draw() {
         myPosition = updateColorPosition(gTarget, thresholdAmount);
 
         // DRAW OTHER BLOBS
-        for (var i = blobs.length - 1; i > 1; i--) {
+        for (var i = blobs.length - 1; i >= 0; i--) {
 
             var id = blobs[i].id;
+            if (id !== socket.id) {
 
-            colorMode(HSB);
-            fill(blobs[i].color, 100, 100);
-            ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
+                colorMode(HSB);
+                fill(blobs[i].color, 100, 100);
+                ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
 
-            // updating other's distance from me
-            blobs[i].d = dist(blobs[i].x, blobs[i].y, myPosition.x, myPosition.y);
+                // updating other's distance from me
+                blobs[i].d = dist(blobs[i].x, blobs[i].y, myPosition.x, myPosition.y);
 
+                // WHEN GIUSEPPE BUMPS OTHERS
+                if (blobs[i].d < 30) {
+                    giuBumpedOther = true;
+                    blob.bo = true;
+                    blobs[i].bg = true;
 
-            // WHEN GIUSEPPE BUMPS OTHERS
-            if (blobs[i].d < 30) {
-                giuBumpedOther = true;
-                blob.bo = true;
-                blobs[i].bg = true;
+                    var a = map(blobs[i].y, 0, height, 0, 0.5);
 
-                var a = map(blobs[i].y, 0, height, 0, 0.5);
+                    bumpedGiuseppeSound.play();
+                    bumpedGiuseppeSound.amp(a, 0.1);
+                }
+                else { bumpedGiuseppeSound.amp(0, 0.3); }
 
-                bumpedGiuseppeSound.play();
-                bumpedGiuseppeSound.amp(a, 0.1);
+                if (blobs[i].bo) {
+
+                    var a = map(blobs[i].y, 0, height, 0, 0.5);
+
+                    bumpedOtherSound.play();
+                    bumpedOtherSound.amp(a, 0.1);
+                }
+                else {
+                    bumpedOtherSound.amp(0, 0.1);
+                }
+
+                fill(255);
+                textAlign(CENTER);
+                textSize(12);
+                text(blobs[i].d, blobs[i].x, blobs[i].y);
             }
-            else { bumpedGiuseppeSound.amp(0, 0.3); }
-
-            if (blobs[i].bo) {
-
-                var a = map(blobs[i].y, 0, height, 0, 0.5);
-
-                bumpedOtherSound.play();
-                bumpedOtherSound.amp(a, 0.1);
-            }
-            else {
-                bumpedOtherSound.amp(0, 0.1);
-            }
-
-            fill(255);
-            textAlign(CENTER);
-            textSize(12);
-            text(blobs[i].d, blobs[i].x, blobs[i].y);
 
         }
 
