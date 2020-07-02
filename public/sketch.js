@@ -46,7 +46,7 @@ var giuBumpedOther;
 
 function preload() {
 
-    bumpedOtherSound = loadSound('sounds/Alert/9.mp3');
+    bumpedOtherSound = loadSound('sounds/Alert/6.mp3');
     bumpedGiuseppeSound = loadSound('sounds/Alert/1.mp3');
     giuBumpedOtherSound = loadSound('sounds/Alert/8.mp3');
 
