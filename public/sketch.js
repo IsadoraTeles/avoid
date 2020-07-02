@@ -67,7 +67,6 @@ function setup() {
     //bumpedOtherSound.playMode('restart');
     //giuBumpedOtherSound.playMode('restart');
 
-
     // SOUND
     wave = new p5.Oscillator();
 
