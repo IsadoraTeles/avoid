@@ -340,27 +340,6 @@ function draw() {
                 bumpedOtherSound.amp(0, 0.1);
             }
 
-            if (blobs[i].bg) {
-
-                if (ran == 2) {
-                    bumpedGiuseppeSound.play();
-                    bumpedGiuseppeSound.amp(a, 0.1);
-                } else {
-                    sfx1.play();
-                    sfx1.amp(a, 0.1);
-                }
-
-            }
-            else {
-
-                if (ran == 2) {
-                    bumpedGiuseppeSound.amp(0, 0.2);
-
-                } else {
-                    sfx1.amp(0, 0.2);
-                }
-
-            }
 
             fill(255);
             textAlign(CENTER);
