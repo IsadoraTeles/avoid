@@ -31,7 +31,7 @@ let captureClient;
 // video
 var w = 320;
 var h = 240;
-var targetColor = [0, 0, 255]; // BLUE
+var targetColor = [255, 0, 0]; // BLUE
 var thresholdAmount = 206.55;
 
 // drawing
