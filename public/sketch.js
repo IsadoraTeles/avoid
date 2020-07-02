@@ -1,20 +1,15 @@
 
 // *** SOUNDS *** //
-let carrier; // this is the oscillator we will hear
-let modulator; // this oscillator will modulate the frequency of the carrier
-var moyeneDistances;
-var moyenneX;
-var moyenneY;
-var numBlobs;
+var bumpedOtherSound;
+var bumpedGiuseppeSound;
+var giuBumpedOtherSound;
 
-// the carrier frequency pre-modulation
-let carrierBaseFreq = 220;
+var wave;
 
-// min/max ranges for modulator
-let modMaxFreq = 112;
-let modMinFreq = 0;
-let modMaxDepth = 150;
-let modMinDepth = -150;
+//var randomSound;
+//var sfx = [];
+//var sfx1, sfx2, sf3, sfx4, sfx5;
+//var alerts = [10];
 
 var button;
 var playing = false;
@@ -45,14 +40,41 @@ var myPosition;
 var mySize;
 var myDistance;
 var isGiuseppe;
+var bumpedGiuseppe;
+var bumpedOther;
+var giuBumpedOther;
+
+function preload() {
+
+    bumpedOtherSound = loadSound('sounds/Alert/9.mp3');
+    bumpedGiuseppeSound = loadSound('sounds/Alert/1.mp3');
+    giuBumpedOtherSound = loadSound('sounds/Alert/8.mp3');
+
+    /*
+    sfx1 = loadSound('sounds/Alert/0.mp3');
+    sfx2 = loadSound('sounds/Alert/1.mp3');
+    sfx3 = loadSound('sounds/Alert/2.mp3');
+    sfx4 = loadSound('sounds/Alert/3.mp3');
+    sfx5 = loadSound('sounds/Alert/4.mp3');
+
+    sfx = [sfx1, sfx2, sf3, sfx4, sfx5];
+    */
+}
 
 function setup() {
 
-    carrier = new p5.Oscillator('sine');
+    //bumpedGiuseppeSound.playMode('restart');
+    //bumpedOtherSound.playMode('restart');
+    //giuBumpedOtherSound.playMode('restart');
 
-    // try changing the type to 'square', 'sine' or 'triangle'
-    modulator = new p5.Oscillator('sawtooth');
 
+    // SOUND
+    wave = new p5.Oscillator();
+
+    wave.setType('sine');
+    wave.start();
+    wave.freq(440);
+    wave.amp(0);
 
     button = createButton('play/pause');
     button.mousePressed(toggle);
@@ -66,6 +88,9 @@ function setup() {
     mySize = 10;
     myDistance = 0;
     isGiuseppe = false;
+    bumpedGiuseppe = false;
+    bumpedOther = false;
+    giuBumpedOther = false;
 
     // STEUP CANVAS
     createCanvas(w, h);
@@ -80,14 +105,16 @@ function setup() {
     setupVideoDraw(w, h);
 
     // ME
-    blob = new Blob(myColor, myPosition.x, myPosition.y, mySize, myDistance, isGiuseppe);
+    blob = new Blob(myColor, myPosition.x, myPosition.y, mySize, myDistance, isGiuseppe, bumpedGiuseppe, bumpedOther);
     var data = {
         color: blob.color,
         x: blob.x,
         y: blob.y,
         s: blob.s,
         d: blob.d,
-        ig: isGiuseppe
+        ig: blob.ig,
+        bg: blob.bg,
+        bo: blob.bo
     }
     socket.emit('start', data);
 
@@ -100,16 +127,7 @@ function setup() {
 
 function draw() {
 
-
     background(0);
-
-    // update my blob
-    blob.color = myColor;
-    blob.x = myPosition.x;
-    blob.y = myPosition.y;
-    blob.s = mySize;
-    blob.d = myDistance;
-    blob.ig = isGiuseppe;
 
 
     // IF IM NOT GIUSEPPE
@@ -117,14 +135,10 @@ function draw() {
 
         myPosition = updateColorPosition(targetColor, thresholdAmount);
 
-        moyeneDistances = 0;
-        moyenneX = 0;
-        moyenneY = 0;
-        numBlobs = 0;
-
         // draw others
         for (var i = blobs.length - 1; i >= 0; i--) {
             var id = blobs[i].id;
+            var posGiu = createVector(0, 0);
 
             // IF ITS NOT ME
             if (id !== socket.id) {
@@ -136,7 +150,17 @@ function draw() {
                     blobs[0].s = 30;
                     blobs[0].d = 0;
 
+                    posGiu = (blobs[0].x, blobs[0].y);
+
+                    // IF I BUMPED GIUSEPPE
                     myDistance = dist(myPosition.x, myPosition.y, blobs[0].x, blobs[0].y);
+                    if (myDistance < 30) {
+                        bumpedGiuseppe = true;
+                        blob.bg = true;
+                    }
+
+                    var f = map(blobs[0].x, 0, width, 1200, 440);
+                    wave.freq(f);
 
                     colorMode(HSB);
                     fill(blobs[0].color, 100, 100);
@@ -146,7 +170,6 @@ function draw() {
                     textSize(12);
                     text('GIUSEPPE', blobs[0].x, blobs[0].y - 20);
 
-
                 }
 
                 // OTHERS THEN ME OR GIUSEPPE
@@ -155,33 +178,68 @@ function draw() {
                     fill(blobs[i].color, 100, 100);
                     ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
 
-
                     fill(255);
                     textAlign(CENTER);
                     textSize(12);
                     text(blobs[i].d, blobs[i].x, blobs[i].y);
 
+                    // IF I BUMPED OTHER PERSON
+                    var othersDist = dist(myPosition.x, myPosition.y, blobs[i].x, blobs[i].y);
+                    if (othersDist < 30) {
+                        bumpedOther = true;
+                        blob.bo = true;
+                    }
                 }
+
+                //randomSound = random(sfx);
+
+                if (blobs[i].bo) {
+
+                    //randomSound.play();
+
+                    var a = map(blobs[i].y, 0, height, 0, 0.5);
+
+                    bumpedOtherSound.play();
+                    bumpedOtherSound.amp(a, 0.1);
+                    //randomSound.amp(1, 0.1);
+                }
+                else {
+                    //randomSound.amp(0, 0.1);
+                    bumpedOtherSound.amp(0, 0.1);
+                }
+
+                if (blobs[i].bg) {
+
+                    var a = map(blobs[i].y, 0, height, 0, 0.5);
+
+                    bumpedGiuseppeSound.play();
+                    bumpedGiuseppeSound.amp(a, 0.1);
+                }
+                else { bumpedGiuseppeSound.amp(0, 0.1); }
+
+                if (bumpedGiuseppe) {
+
+                    var a = map(myPosition.y, 0, height, 0, 0.5);
+
+                    bumpedGiuseppeSound.play();
+                    bumpedGiuseppeSound.amp(a, 0.1);
+                }
+                else { bumpedGiuseppeSound.amp(0, 0.2); }
+
+                if (bumpedOther) {
+
+                    var a = map(myPosition.y, 0, height, 0, 0.5);
+
+                    bumpedOtherSound.play();
+                    bumpedOtherSound.amp(a, 0.1);
+                }
+                else { bumpedOtherSound.amp(0, 0.2); }
             }
-
-            moyeneDistances = (moyeneDistances + blobs[i].d) / blobs.length;
-            moyenneX = (moyenneX + blobs[i].x) / blobs.length;
-            moyenneY = (moyenneY + blobs[i].y) / blobs.length;
-
-            // map mouseY to modulator freq between a maximum and minimum frequency
-            let modFreq = map(moyeneDistances, 30, 300, modMinFreq, modMaxFreq);
-            modulator.freq(modFreq);
-
-            // change the amplitude of the modulator
-            // negative amp reverses the sawtooth waveform, and sounds percussive
-            //
-            let modDepth = map(moyenneX, 0, width, modMinDepth, modMaxDepth);
-            modulator.amp(modDepth);
-
 
             // IF I AM GIUSEPPE
             if (blobs[0].id == socket.id && isGiuseppe == false) {
                 isGiuseppe = true; // created giuseppe on first connected
+                blob.ig = true;
             }
         }
 
@@ -199,54 +257,49 @@ function draw() {
             y: blob.y,
             s: blob.s,
             d: blob.d,
-            ig: false
+            ig: isGiuseppe,
+            bg: bumpedGiuseppe,
+            bo: bumpedOther
         };
         socket.emit('update', data);
         ////////////
     }
 
+
+    // IF I AM GIUSEPPE
     if (isGiuseppe) {
 
         myPosition = updateColorPosition(gTarget, thresholdAmount);
-        //giuPosition = (myPosition.x, myPosition.y);
 
-        moyeneDistances = 0;
-        moyenneX = 0;
-        moyenneY = 0;
-        numBlobs = 0;
-
-        for (var i = blobs.length - 1; i >= 0; i--) {
+        // DRAW OTHER BLOBS
+        for (var i = blobs.length - 1; i > 0; i--) {
 
             var id = blobs[i].id;
-            // IF ITS NOT ME
-            if (id !== socket.id) {
 
-                colorMode(HSB);
-                fill(blobs[i].color, 100, 100);
-                ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
+            colorMode(HSB);
+            fill(blobs[i].color, 100, 100);
+            ellipse(blobs[i].x, blobs[i].y, blobs[i].s, blobs[i].s);
 
-                // updating other's distance from me
-                blobs[i].d = dist(blobs[i].x, blobs[i].y, myPosition.x, myPosition.y);
+            // updating other's distance from me
+            blobs[i].d = dist(blobs[i].x, blobs[i].y, myPosition.x, myPosition.y);
 
-                fill(255);
-                textAlign(CENTER);
-                textSize(12);
-                text(blobs[i].d, blobs[i].x, blobs[i].y);
+            // WHEN GIUSEPPE BUMPS OTHERS
+            if (blobs[i].d < 30) {
+                giuBumpedOther = true;
+                blob.bo = true;
+
+                var a = map(myPosition.y, 0, height, 0, 0.5);
+
+                giuBumpedOtherSound.play();
+                giuBumpedOtherSound.amp(a, 0.1);
             }
+            else { giuBumpedOtherSound.amp(0, 0.3); }
 
-            moyeneDistances = (moyeneDistances + blobs[i].d) / blobs.length;
-            moyenneX = (moyenneX + blobs[i].x) / blobs.length;
-            moyenneY = (moyenneY + blobs[i].y) / blobs.length;
+            fill(255);
+            textAlign(CENTER);
+            textSize(12);
+            text(blobs[i].d, blobs[i].x, blobs[i].y);
 
-            // map mouseY to modulator freq between a maximum and minimum frequency
-            let modFreq = map(moyenneY, height, 0, modMinFreq, modMaxFreq);
-            modulator.freq(modFreq);
-
-            // change the amplitude of the modulator
-            // negative amp reverses the sawtooth waveform, and sounds percussive
-            //
-            let modDepth = map(moyenneX, 0, width, modMinDepth, modMaxDepth);
-            modulator.amp(modDepth);
         }
 
         ////////
@@ -255,6 +308,8 @@ function draw() {
         blob.d = 0;
 
         blob.drawBlob();
+        var f = map(myPosition.x, 0, width, 1200, 440);
+        wave.freq(f);
 
         fill(255);
         textAlign(CENTER);
@@ -266,13 +321,28 @@ function draw() {
             x: blob.x,
             y: blob.y,
             s: blob.s,
-            d: blob.d,
-            ig: true
+            d: 0,
+            ig: isGiuseppe,
+            bg: bumpedGiuseppe,
+            bo: bumpedOther
         };
         socket.emit('update', data);
         /////////
     }
 
+    // update my blob
+    blob.color = myColor;
+    blob.x = myPosition.x;
+    blob.y = myPosition.y;
+    blob.s = mySize;
+    blob.d = myDistance;
+    blob.ig = isGiuseppe;
+    blob.bg = bumpedGiuseppe;
+    blob.bo = bumpedOther;
+
+    bumpedGiuseppe = false;
+    bumpedOther = false;
+    giuBumpedOther = false;
 }
 
 // *** VIDEO DRAW *** //
@@ -335,23 +405,14 @@ function updateColorPosition(tc, ta) {
 
 function toggle() {
     if (!playing) {
-        carrier.amp(1.0, 0.01);
-        carrier.freq(carrierBaseFreq); // set frequency
-        carrier.start(); // start oscillating
-
-        modulator.start();
-
-        // add the modulator's output to modulate the carrier's frequency
-        modulator.disconnect();
-        carrier.freq(modulator);
-
+        wave.amp(0.5, 1);
         playing = true;
     } else {
-
-        carrier.amp(0.0, 1.0);
-
+        wave.amp(0, 1);
         playing = false;
     }
 }
+
+
 
 
