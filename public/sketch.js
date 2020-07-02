@@ -46,19 +46,17 @@ var giuBumpedOther;
 
 function preload() {
 
-    bumpedOtherSound = loadSound('sounds/Alert/6.mp3');
+    bumpedOtherSound = loadSound('sounds/Alert/3.mp3');
     bumpedGiuseppeSound = loadSound('sounds/Alert/1.mp3');
     giuBumpedOtherSound = loadSound('sounds/Alert/8.mp3');
 
-    /*
+
     sfx1 = loadSound('sounds/Alert/0.mp3');
-    sfx2 = loadSound('sounds/Alert/1.mp3');
-    sfx3 = loadSound('sounds/Alert/2.mp3');
-    sfx4 = loadSound('sounds/Alert/3.mp3');
-    sfx5 = loadSound('sounds/Alert/4.mp3');
+    sfx2 = loadSound('sounds/Alert/2.mp3');
+    sfx3 = loadSound('sounds/Woosh/3.mp3');
 
     sfx = [sfx1, sfx2, sf3, sfx4, sfx5];
-    */
+
 }
 
 function setup() {
@@ -189,6 +187,10 @@ function draw() {
                         blob.bo = true;
                     }
 
+                    ///////////
+
+                    var ran = round(random(2));
+
                     if (blobs[i].bo) {
 
                         //randomSound.play();
@@ -206,26 +208,51 @@ function draw() {
 
                     if (blobs[i].bg) {
 
-                        var a = map(blobs[i].y, 0, height, 0, 0.5);
+                        if (ran == 2) {
+                            bumpedGiuseppeSound.play();
+                            bumpedGiuseppeSound.amp(a, 0.1);
+                        } else {
+                            sfx1.play();
+                            sfx1.amp(a, 0.1);
+                        }
 
-                        bumpedGiuseppeSound.play();
-                        bumpedGiuseppeSound.amp(a, 0.1);
                     }
-                    else { bumpedGiuseppeSound.amp(0, 0.1); }
+                    else {
+
+                        if (ran == 2) {
+                            bumpedGiuseppeSound.amp(0, 0.2);
+
+                        } else {
+                            sfx1.amp(0, 0.2);
+                        }
+
+                    }
                 }
-
-                //randomSound = random(sfx);
-
 
 
                 if (bumpedGiuseppe) {
 
                     var a = map(myPosition.y, 0, height, 0, 0.5);
 
-                    bumpedGiuseppeSound.play();
-                    bumpedGiuseppeSound.amp(a, 0.1);
+                    if (ran == 1) {
+                        bumpedGiuseppeSound.play();
+                        bumpedGiuseppeSound.amp(a, 0.1);
+                    } else {
+                        sfx1.play();
+                        sfx1.amp(a, 0.1);
+                    }
+
                 }
-                else { bumpedGiuseppeSound.amp(0, 0.2); }
+                else {
+
+                    if (ran == 1) {
+                        bumpedGiuseppeSound.amp(0, 0.2);
+
+                    } else {
+                        sfx1.amp(0, 0.2);
+                    }
+
+                }
 
                 if (bumpedOther) {
 
