@@ -189,33 +189,35 @@ function draw() {
                         bumpedOther = true;
                         blob.bo = true;
                     }
+
+                    if (blobs[i].bo) {
+
+                        //randomSound.play();
+
+                        var a = map(blobs[i].y, 0, height, 0, 0.5);
+
+                        bumpedOtherSound.play();
+                        bumpedOtherSound.amp(a, 0.1);
+                        //randomSound.amp(1, 0.1);
+                    }
+                    else {
+                        //randomSound.amp(0, 0.1);
+                        bumpedOtherSound.amp(0, 0.1);
+                    }
+
+                    if (blobs[i].bg) {
+
+                        var a = map(blobs[i].y, 0, height, 0, 0.5);
+
+                        bumpedGiuseppeSound.play();
+                        bumpedGiuseppeSound.amp(a, 0.1);
+                    }
+                    else { bumpedGiuseppeSound.amp(0, 0.1); }
                 }
 
                 //randomSound = random(sfx);
 
-                if (blobs[i].bo) {
 
-                    //randomSound.play();
-
-                    var a = map(blobs[i].y, 0, height, 0, 0.5);
-
-                    bumpedOtherSound.play();
-                    bumpedOtherSound.amp(a, 0.1);
-                    //randomSound.amp(1, 0.1);
-                }
-                else {
-                    //randomSound.amp(0, 0.1);
-                    bumpedOtherSound.amp(0, 0.1);
-                }
-
-                if (blobs[i].bg) {
-
-                    var a = map(blobs[i].y, 0, height, 0, 0.5);
-
-                    bumpedGiuseppeSound.play();
-                    bumpedGiuseppeSound.amp(a, 0.1);
-                }
-                else { bumpedGiuseppeSound.amp(0, 0.1); }
 
                 if (bumpedGiuseppe) {
 
