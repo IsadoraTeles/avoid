@@ -316,7 +316,7 @@ function draw() {
                 giuBumpedOther = true;
                 blob.bo = true;
 
-                var a = map(myPosition.y, 0, height, 0, 0.5);
+                var ran = round(random(2));
 
                 giuBumpedOtherSound.play();
                 giuBumpedOtherSound.amp(a, 0.1);
@@ -327,6 +327,45 @@ function draw() {
             textAlign(CENTER);
             textSize(12);
             text(blobs[i].d, blobs[i].x, blobs[i].y);
+
+            var ran = round(random(2));
+
+            if (blobs[i].bo) {
+
+                //randomSound.play();
+
+                var a = map(blobs[i].y, 0, height, 0, 0.5);
+
+                bumpedOtherSound.play();
+                bumpedOtherSound.amp(a, 0.1);
+                //randomSound.amp(1, 0.1);
+            }
+            else {
+                //randomSound.amp(0, 0.1);
+                bumpedOtherSound.amp(0, 0.1);
+            }
+
+            if (blobs[i].bg) {
+
+                if (ran == 2) {
+                    bumpedGiuseppeSound.play();
+                    bumpedGiuseppeSound.amp(a, 0.1);
+                } else {
+                    sfx1.play();
+                    sfx1.amp(a, 0.1);
+                }
+
+            }
+            else {
+
+                if (ran == 2) {
+                    bumpedGiuseppeSound.amp(0, 0.2);
+
+                } else {
+                    sfx1.amp(0, 0.2);
+                }
+
+            }
 
         }
 
