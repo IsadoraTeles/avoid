@@ -1,3 +1,5 @@
+var canvas;
+
 
 // *** SOUNDS *** //
 var bumpedOtherSound;
@@ -29,8 +31,8 @@ let captureClient;
 
 // ***VARIABLES*** //
 // video
-var w = 320;
-var h = 240;
+var w = 640;
+var h = 480;
 var targetColor = [255, 0, 0]; // BLUE
 var thresholdAmount = 206.55;
 
@@ -55,7 +57,6 @@ function preload() {
     sfx2 = loadSound('sounds/Alert/2.mp3');
     sfx3 = loadSound('sounds/Woosh/3.mp3');
 
-    sfx = [sfx1, sfx2, sf3, sfx4, sfx5];
 
 }
 
@@ -73,16 +74,16 @@ function setup() {
     wave.freq(440);
     wave.amp(0);
 
-    button = createButton('play/pause');
-    button.mousePressed(toggle);
-
     ///////
 
     giuPosition = createVector(0, 0);
 
     myColor = random(360);
+    // colorMode(HSB, 100);
+    // button.style('background-color', myColor);
+
     myPosition = createVector(0, 0);
-    mySize = 10;
+    mySize = 20;
     myDistance = 0;
     isGiuseppe = false;
     bumpedGiuseppe = false;
@@ -90,7 +91,13 @@ function setup() {
     giuBumpedOther = false;
 
     // STEUP CANVAS
-    createCanvas(w, h);
+    canvas = createCanvas(w, h);
+    //canvas.position(0, 0);
+    button = createButton('play/pause noise');
+    button.position(60, canvas.y - 40);
+    button.size(150, 30);
+    button.mousePressed(toggle);
+
     //background(0);
 
     // SETUP SOCKETS
@@ -126,6 +133,10 @@ function draw() {
 
     background(0);
 
+    noStroke();
+
+    image(captureClient, 0, 0, width, width * captureClient.height / captureClient.width);
+    captureClient.hide();
 
     // IF IM NOT GIUSEPPE
     if (isGiuseppe == false) {
@@ -165,7 +176,7 @@ function draw() {
                     fill(255);
                     textAlign(CENTER);
                     textSize(12);
-                    text('GIUSEPPE', blobs[0].x, blobs[0].y - 20);
+                    //text('GIUSEPPE', blobs[0].x, blobs[0].y - 20);
 
                 }
 
@@ -178,7 +189,7 @@ function draw() {
                     fill(255);
                     textAlign(CENTER);
                     textSize(12);
-                    text(blobs[i].d, blobs[i].x, blobs[i].y);
+                    //text(blobs[i].d, blobs[i].x, blobs[i].y);
 
                     // IF I BUMPED OTHER PERSON
                     var othersDist = dist(myPosition.x, myPosition.y, blobs[i].x, blobs[i].y);
@@ -252,7 +263,7 @@ function draw() {
         fill(255);
         textAlign(CENTER);
         textSize(12);
-        text(blob.d, blob.x, blob.y + blob.s);
+        //text(blob.d, blob.x, blob.y + blob.s);
 
         var data = {
             color: blob.color,
@@ -311,27 +322,27 @@ function draw() {
                     bumpedOtherSound.amp(0, 0.1);
                 }
 
-                fill(255);
-                textAlign(CENTER);
-                textSize(12);
-                text(blobs[i].d, blobs[i].x, blobs[i].y);
+                //fill(255);
+                //textAlign(CENTER);
+                //textSize(12);
+                //text(blobs[i].d, blobs[i].x, blobs[i].y);
             }
 
         }
 
         ////////
         blob.color = 0;
-        blob.s = 30;
+        blob.s = 50;
         blob.d = 0;
 
         blob.drawBlob();
         var f = map(myPosition.x, 0, width, 1200, 440);
         wave.freq(f);
 
-        fill(255);
-        textAlign(CENTER);
-        textSize(12);
-        text('GIUSEPPE', blob.x, blob.y - 20);
+        //fill(255);
+        //textAlign(CENTER);
+        //textSize(12);
+        //text('GIUSEPPE', blob.x, blob.y - 20);
 
         var data = {
             color: blob.color,
@@ -360,6 +371,8 @@ function draw() {
     bumpedGiuseppe = false;
     bumpedOther = false;
     giuBumpedOther = false;
+
+
 }
 
 // *** VIDEO DRAW *** //
@@ -425,7 +438,7 @@ function toggle() {
         wave.amp(0.5, 1);
         playing = true;
     } else {
-        wave.amp(0, 1);
+        wave.amp(0, 0.2);
         playing = false;
     }
 }
