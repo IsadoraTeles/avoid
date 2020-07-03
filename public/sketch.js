@@ -18,6 +18,7 @@ var playing = false;
 
 // *** CLIENT *** //
 //
+//
 var giuPosition;
 var gTarget = [255, 0, 0]; // RED
 // ***OBJECTS*** //
