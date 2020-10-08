@@ -39,12 +39,12 @@ function heartbeat() {
 // EVENT NEW CONNECTION
 // callback function to run when we hahve a new
 // individual connection
-io.sockets.on('connection', newConnection);
+io.sockets.on('connection', newConnection); // if I have a new connection
 
 
 // ON NEW CONNECTION
 function newConnection(socket) {
-    console.log('new connection : ' + socket.id);
+    console.log('new connection : ' + socket.id); // id of the ne connection
 
     // CREATE NEW BLOB OBJECT
     socket.on('start', start)
