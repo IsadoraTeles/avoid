@@ -1,4 +1,4 @@
-var canvas;
+/*var canvas;
 
 
 // *** SOUNDS *** //
@@ -425,12 +425,12 @@ function updateColorPosition(tc, ta) {
         captureClient.updatePixels();
     }
 
-    /*
-    var c = blob.color;
-    colorMode(HSB);
-    fill(c, 100, 100);
-    ellipse(sumPosition.x, sumPosition.y, blob.size, blob.size);
-*/
+
+   // var c = blob.color;
+    //colorMode(HSB);
+    //fill(c, 100, 100);
+    //ellipse(sumPosition.x, sumPosition.y, blob.size, blob.size);
+
 
     return sumPosition;
 }
@@ -445,6 +445,82 @@ function toggle() {
     }
 }
 
+*/
 
+// --------------------- //
 
+// CLIENT SIDE
+
+// COMMUNICATION
+/*global io*/
+var socket = io();
+
+/**
+ * Connexion de l'utilisateur
+ * Uniquement si le username n'est pas vide et n'existe pas encore
+ */
+$('#login form').submit(function (e) {
+    e.preventDefault();
+    var user = {
+        username: $('#login input').val().trim()
+    };
+    if (user.username.length > 0) { // Si le champ de connexion n'est pas vide
+        socket.emit('user-login', user, function (success) {
+            if (success) {
+                $('body').removeAttr('id'); // Cache formulaire de connexion
+                $('#chat input').focus(); // Focus sur le champ du message
+            }
+        });
+    }
+});
+
+/**
+ * Envoi d'un message
+ */
+$('#chat form').submit(function (e) {
+    e.preventDefault();
+    var message = {
+        text: $('#m').val()
+    };
+    $('#m').val('');
+    if (message.text.trim().length !== 0) { // Gestion message vide
+        socket.emit('chat-message', message);
+    }
+    $('#chat input').focus(); // Focus sur le champ du message
+});
+
+/**
+ * Réception d'un message
+ */
+socket.on('chat-message', function (message) {
+    $('#messages').append($('<li>').html('<span class="username">' + message.username + '</span> ' + message.text));
+});
+
+/**
+ * Réception d'un message de service
+ */
+socket.on('service-message', function (message) {
+    $('#messages').append($('<li class="' + message.type + '">').html('<span class="info">information</span> ' + message.text));
+});
+
+/**
+ * Connexion d'un nouvel utilisateur
+ */
+socket.on('user-login', function (user) {
+    $('#users').append($('<li class="' + user.username + ' new">').html(user.username));
+    setTimeout(function () {
+        $('#users li.new').removeClass('new');
+    }, 1000);
+
+});
+
+/**
+ * Déconnexion d'un utilisateur
+ */
+socket.on('user-logout', function (user) {
+    var userIndex = users.indexOf(user);
+    if (userIndex !== -1) {
+        users.splice(userIndex, 1);
+    }
+});
 

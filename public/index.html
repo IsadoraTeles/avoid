@@ -12,12 +12,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.sound.js"></script>
 
+    <link rel="stylesheet" href="style.css" />
     <title>A.VOID</title>
 </head>
 
-<body>
-    <div id='container'></div>
+<body id="logged-out">
+    <section id="chat">
+        <ul id="messages">
+        </ul>
+        <ul id="users">
+        </ul>
+        <form action="">
+            <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+    </section>
+    <section id="login">
+        <form action="">
+            <label for="u">Username</label>
+            <input id="u" autocomplete="off" autofocus />
+            <p>
+                <button>Login</button>
+            </p>
+        </form>
+    </section>
 
+
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.6/rivets.bundled.min.js"></script>
+    <div id='container'></div>
+    <!--
     <h1>A.VOID</h1>
     <h2>Performance sonore d'isolement graphique</h2>
 
@@ -60,22 +83,19 @@
         Les accidents de passage comptent tout autant, car tout se transforme en création partagée dans ce brouhaha de
         bruits et des points
         colorés.</p>
+    -->
 
     <!--P5JS DRAWING PART-->
     <script src="sketch.js"></script>
-    <script src="blob.js"></script>
 
-    <h2>Vidéo en live stream de la performance : </h2>
-    <p>lien sur Vimeo : https://vimeo.com/434980908</p>
+    <!--<h2>Vidéo en live stream de la performance : </h2>>
+    <!<p>lien sur Vimeo : https://vimeo.com/434980908</p>>
 
-    <!--PERFORMANCE VIDEO STREAM PART-->
-
+    <!PERFORMANCE VIDEO STREAM PART
     <div class="resp-container">
         <iframe width="300" height="150" class="resp-iframe" src="https://player.vimeo.com/video/434980908"
             gesture="media" allow="encrypted-media" allowfullscreen="allowfullscreen"></iframe>
     </div>
-
-</body>
-
+    -
 
 </html>
