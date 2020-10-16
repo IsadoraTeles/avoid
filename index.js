@@ -42,6 +42,35 @@ io.on('connection', function (socket) {
     }
 
     /**
+         * Déconnexion d'un utilisateur : broadcast d'un 'service-message'
+         */
+    /**
+     * Déconnexion d'un utilisateur
+    */
+    socket.on('disconnect', function () {
+        if (loggedBlob !== undefined) {
+            // Broadcast d'un 'service-message'
+            var serviceMessage =
+            {
+                text: 'User "' + loggedBlob.name + '" disconnected',
+                type: 'logout'
+            };
+
+            socket.broadcast.emit('service-message', serviceMessage);
+
+            // Suppression de la liste des connectés
+            var blobIndex = blobs.indexOf(loggedBlob);
+
+            if (blobIndex !== -1) {
+                blobs.splice(blobIndex, 1);
+            }
+
+            // Emission d'un 'user-logout' contenant le user
+            io.emit('user-logout', loggedBlob);
+        }
+    });
+
+    /**
     * Log de connexion d'un utilisateur (avant login)
     */
     console.log('a user connected');
@@ -91,35 +120,6 @@ io.on('connection', function (socket) {
             callback(false);
         }
 
-
-        /**
-         * Déconnexion d'un utilisateur : broadcast d'un 'service-message'
-         */
-        /**
-         * Déconnexion d'un utilisateur
-        */
-        socket.on('disconnect', function () {
-            if (loggedBlob !== undefined) {
-                // Broadcast d'un 'service-message'
-                var serviceMessage =
-                {
-                    text: 'User "' + loggedBlob.name + '" disconnected',
-                    type: 'logout'
-                };
-
-                socket.broadcast.emit('service-message', serviceMessage);
-
-                // Suppression de la liste des connectés
-                var blobIndex = blobs.indexOf(loggedBlob);
-
-                if (blobIndex !== -1) {
-                    blobs.splice(blobIndex, 1);
-                }
-
-                // Emission d'un 'user-logout' contenant le user
-                io.emit('user-logout', loggedBlob);
-            }
-        });
 
         /**
          * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
