@@ -1,7 +1,9 @@
 // CLIENT SIDE
 
 // BLOB
-var blob = new Blob;
+var name;
+var couleur;
+var blob;
 var allBlobs = [];
 
 
@@ -18,10 +20,22 @@ var socket = io();
 $('#login form').submit(function (e) {
     e.preventDefault();
 
-    blob.name = $('#login input').val().trim();
+    var user = {
+        username: $('#login input').val().trim()
+    };
 
-    if (blob.name.length > 0) {
+
+    if (user.username.length > 0) {
         // Si le champ de connexion n'est pas vide
+
+        var r = random(0, 255);
+        var g = random(0, 255);
+        var b = random(0, 255);
+
+        couleur = color(r, g, b);
+
+        blob = new Blob(username, couleur);
+
         socket.emit('user-login', blob, function (success) {
             if (success) {
                 $('body').removeAttr('id'); // Cache formulaire de connexion
@@ -29,6 +43,17 @@ $('#login form').submit(function (e) {
             }
         });
     }
+});
+
+/**
+ * Connexion d'un nouvel utilisateur
+ */
+socket.on('user-login', function (blob) {
+    $('#users').append($('<li class="' + blob.name + ' new">').html(blob.name));
+    setTimeout(function () {
+        $('#users li.new').removeClass('new');
+    }, 1000);
+
 });
 
 /**
@@ -50,19 +75,37 @@ socket.on('allBlobs', function (allBlobs) {
 });
 
 function setup() {
-
 }
 
 function draw() {
+    // draw all blobs
+    drawAllBlobs();
 
 }
 
 function mouseDragged() {
-    blob.draw();
+    // update my blob data
+    blob.updateBlob(mouseX, mouseY);
 
     /**
-     * Envoi d'un message 
+     * Envoi du blob
      */
     var blobMessage = blob;
     socket.emit('blob-message', blobMessage);
+
+}
+
+function drawAllBlobs() {
+    for (var i = 0; i < allBlobs.length; i++) {
+
+        // extract information about blob
+        var couleur = allBlobs[i].color;
+        var posX = allBlobs[i].x;
+        var posY = allBlobs[i].y;
+
+        // draw blob
+        fill(couleur);
+        noStroke();
+        ellipse(posX, posY, 20, 20);
+    }
 }
