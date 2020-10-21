@@ -1,17 +1,22 @@
-// VECTOR OBJECT
 
-class Blob() 
-{
+class Blob {
 
-    constructor(name, couleur)
-    {
-        var name = name;
-        var couleur = couleur;
-        var x = 0;
-        var y = 0;
-    };
+    constructor() {
+        this.r = random(0, 255);
+        this.g = random(0, 255);
+        this.b = random(0, 255);
 
-    function updateBlob(newX, newY) {
+        this.color = color(r, g, b);
+        this.x = 0;
+        this.y = 0;
+    }
+
+    giveNameAndId(username, id) {
+        this.name = username;
+        this.id = id;
+    }
+
+    updateBlob(newX, newY) {
         this.x = newX;
         this.y = newY;
     }

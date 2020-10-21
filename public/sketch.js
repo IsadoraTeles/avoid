@@ -2,16 +2,18 @@
 
 // BLOB
 var name;
-var couleur;
+var allBlobsData = [];
 var blob;
-var allBlobs = [];
-
 
 // COMMUNICATION
 /*global io*/
 var socket = io();
 
-// socket.connect(); ??????????????????
+function setup() {
+
+    blob = new Blob();
+
+}
 
 /**
  * Connexion de l'utilisateur
@@ -20,23 +22,26 @@ var socket = io();
 $('#login form').submit(function (e) {
     e.preventDefault();
 
-    var user = {
-        username: $('#login input').val().trim()
-    };
-
+    var user = { username: $('#login input').val().trim() };
 
     if (user.username.length > 0) {
         // Si le champ de connexion n'est pas vide
 
-        var r = random(0, 255);
-        var g = random(0, 255);
-        var b = random(0, 255);
+        //blob.giveNameAndId(socket.id, user.username);
 
-        couleur = color(r, g, b);
+        var data1 = {
+            id: blob.id,
+            name: blob.name,
+            x: blob.x,
+            y: blob.y,
+            color: blob.color
+        };
 
-        blob = new Blob(username, couleur);
+        console.log('login');
+        console.log(blob.name);
 
-        socket.emit('user-login', blob, function (success) {
+
+        socket.emit('user-login', user, function (success) {
             if (success) {
                 $('body').removeAttr('id'); // Cache formulaire de connexion
                 $('#chat input').focus(); // Focus sur le champ du message
@@ -48,21 +53,23 @@ $('#login form').submit(function (e) {
 /**
  * Connexion d'un nouvel utilisateur
  */
-socket.on('user-login', function (blob) {
-    $('#users').append($('<li class="' + blob.name + ' new">').html(blob.name));
+socket.on('user-login', function (user) {
+    $('#users').append($('<li class="' + data2.name + ' new">').html(data2.name));
     setTimeout(function () {
         $('#users li.new').removeClass('new');
     }, 1000);
-
 });
 
 /**
  * Déconnexion d'un utilisateur
  */
-socket.on('user-logout', function (blob) {
-    var blobIndex = allBlobs.indexOf(blob);
-    if (blobIndex !== -1) {
-        allBlobs.splice(blobIndex, 1);
+socket.on('user-logout', function (data4) {
+    var blobOutIndex;
+    for (var i = 0; i < allBlobsData.length; i++) {
+        if (data4.id == allBlobsData[i].id) {
+            blobOutIndex = allBlobsData[i];
+            allBlobsData.splice(blobOutIndex, 1);
+        }
     }
 
 });
@@ -70,12 +77,10 @@ socket.on('user-logout', function (blob) {
 /**
  * Réception d'un message
  */
-socket.on('allBlobs', function (allBlobs) {
-    allBlobsHere = allBlobs;
+socket.on('blobsData', function (data3) {
+    allBlobsData = data3;
 });
 
-function setup() {
-}
 
 function draw() {
     // draw all blobs
@@ -90,21 +95,30 @@ function mouseDragged() {
     /**
      * Envoi du blob
      */
-    var blobMessage = blob;
-    socket.emit('blob-message', blobMessage);
+    var data5 = {
+        id: blob.id,
+        name: blob.name,
+        color: blob.color,
+        x: blob.x,
+        y: blob.y
+    };
+    socket.emit('update', data5);
 
 }
 
 function drawAllBlobs() {
-    for (var i = 0; i < allBlobs.length; i++) {
+    for (var i = 0; i < allBlobsData.length; i++) {
 
+        var tempBlob = new Blob();
         // extract information about blob
-        var couleur = allBlobs[i].color;
-        var posX = allBlobs[i].x;
-        var posY = allBlobs[i].y;
+        //var id = allBlobsData[i].id;
+        // var name = allBlobsData[i].name;
+        var color = allBlobsData[i].color;
+        var posX = allBlobsData[i].x;
+        var posY = allBlobsData[i].y;
 
         // draw blob
-        fill(couleur);
+        fill(color);
         noStroke();
         ellipse(posX, posY, 20, 20);
     }
