@@ -60,9 +60,9 @@ io.on('connection', function (socket)
     {
         // Vérification que l'utilisateur n'existe pas
         var userIndex = -1;
-        for (i = 0; i < users.length; i++) 
+        for (i = 0; i < allBlobsData.length; i++) 
         {
-            if (users[i].username === user.username) 
+            if (allBlobsData[i].username === user.username) 
             {
                 userIndex = i;
             }
