@@ -21,9 +21,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 var blobsData = []; // list of data for blobs
 
 // construction function
-function Blob(id, username, color, x, y) {
+function Blob(id, color, x, y) {
     this.id = id;
-    this.username = username;
+    //this.username = username;
     this.color = color;
     this.x = x;
     this.y = y;
@@ -89,8 +89,8 @@ io.on('connection', function (socket) {
     });
 
     socket.on('start', function (data) {
-        console.log(data.id + ' ' + data.username + ' ' + data.x + ' ' + data.y);
-        var blob = new Blob(data.id, data.username, data.color, data.x, data.y);
+        console.log(data.id + ' ' + ' ' + data.x + ' ' + data.y);
+        var blob = new Blob(data.id, data.color, data.x, data.y);
         allBlobsData.push(blob);
     });
 

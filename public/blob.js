@@ -1,18 +1,18 @@
 
-function Blob(id, username, color, x, y) {
-    this.id = id;
-    this.username = username;
-    this.color = color;
-    this.x = x;
-    this.y = y;
-  
-    this.update = function() {
-      this.x = mouseX;
-      this.y = mouseY;
-    };
+function Blob(id, color, x, y) {
+  this.id = id;
+  //this.username = username;
+  this.color = color;
+  this.x = x;
+  this.y = y;
 
-    this.show = function() {
-        fill(this.color);
-        ellipse(this.x, this.y, 10, 10);
-      };
-  }
+  this.update = function () {
+    this.x = mouseX;
+    this.y = mouseY;
+  };
+
+  this.show = function () {
+    fill(this.color);
+    ellipse(this.x, this.y, 10, 10);
+  };
+}
