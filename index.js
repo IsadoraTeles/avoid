@@ -21,8 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var blobsData = []; // list of data for blobs
 
 // construction function
-function Blob(id, username, color, x, y) 
-{
+function Blob(id, username, color, x, y) {
     this.id = id;
     this.username = username;
     this.color = color;
@@ -33,15 +32,13 @@ function Blob(id, username, color, x, y)
 setInterval(heartbeat, 33);
 
 // STILL USEFUL ???
-function heartbeat() 
-{
+function heartbeat() {
     io.sockets.emit('heartbeat', blobsData); // message with array of data
 }
 
 /*******************************/
 
-io.on('connection', function (socket) 
-{
+io.on('connection', function (socket) {
 
     /**
      * Utilisateur connecté à la socket
@@ -56,30 +53,26 @@ io.on('connection', function (socket)
     /**
      * Connexion d'un utilisateur via le formulaire :
      */
-    socket.on('user-login', function (user, callback) 
-    {
+    socket.on('user-login', function (user, callback) {
         // Vérification que l'utilisateur n'existe pas
         var userIndex = -1;
-        for (i = 0; i < allBlobsData.length; i++) 
-        {
-            if (allBlobsData[i].username === user.username) 
-            {
+        for (i = 0; i < blobsData.length; i++) {
+            if (blobsData[i].username === user.username) {
                 userIndex = i;
             }
         }
-        if (user !== undefined && userIndex === -1) 
-        { 
+        if (user !== undefined && userIndex === -1) {
             // S'il est bien nouveau
             // Sauvegarde de l'utilisateur et ajout à la liste des connectés
             loggedBlob = user;
             //blobsData.push(loggedBlob);
             // Envoi des messages de service
-            var userServiceMessage = 
+            var userServiceMessage =
             {
                 text: 'You logged in as "' + loggedBlob.username + '"',
                 type: 'login'
             };
-            var broadcastedServiceMessage = 
+            var broadcastedServiceMessage =
             {
                 text: 'User "' + loggedBlob.username + '" logged in',
                 type: 'login'
@@ -89,15 +82,13 @@ io.on('connection', function (socket)
             // Emission de 'user-login' et appel du callback
             io.emit('user-login', loggedBlob);
             callback(true);
-        } 
-        else 
-        {
+        }
+        else {
             callback(false);
         }
     });
 
-    socket.on('start', function(data) 
-    {
+    socket.on('start', function (data) {
         console.log(data.id + ' ' + data.username + ' ' + data.x + ' ' + data.y);
         var blob = new Blob(data.id, data.username, data.color, data.x, data.y);
         allBlobsData.push(blob);
@@ -106,14 +97,11 @@ io.on('connection', function (socket)
     /**
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
      */
-    socket.on('update', function(data) 
-    {
+    socket.on('update', function (data) {
         //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
         var blob;
-        for (var i = 0; i < blobsData.length; i++) 
-        {
-            if (socket.id == blobsData[i].id) 
-            {
+        for (var i = 0; i < blobsData.length; i++) {
+            if (socket.id == blobsData[i].id) {
                 blob = blobsData[i];
             }
         }
@@ -128,29 +116,26 @@ io.on('connection', function (socket)
     /**
      * Déconnexion d'un utilisateur
     */
-   socket.on('disconnect', function () 
-   {
-       if (loggedBlob !== undefined) 
-       {
-           // Broadcast d'un 'service-message'
-           var serviceMessage = 
-           {
-               text: 'User "' + loggedBlob.username + '" disconnected',
-               type: 'logout'
-           };
-           socket.broadcast.emit('service-message', serviceMessage);
-           
-           // Suppression de la liste des connectés
-           var userIndex = blobsData.indexOf(loggedBlob);
-           if (userIndex !== -1) 
-           {
-               blobsData.splice(userIndex, 1);
-           }
-           
-           // Emission d'un 'user-logout' contenant le user
-           //io.emit('user-logout', loggedBlob);      
-       }
-   });
+    socket.on('disconnect', function () {
+        if (loggedBlob !== undefined) {
+            // Broadcast d'un 'service-message'
+            var serviceMessage =
+            {
+                text: 'User "' + loggedBlob.username + '" disconnected',
+                type: 'logout'
+            };
+            socket.broadcast.emit('service-message', serviceMessage);
+
+            // Suppression de la liste des connectés
+            var userIndex = blobsData.indexOf(loggedBlob);
+            if (userIndex !== -1) {
+                blobsData.splice(userIndex, 1);
+            }
+
+            // Emission d'un 'user-logout' contenant le user
+            //io.emit('user-logout', loggedBlob);      
+        }
+    });
 
 });
 
@@ -158,8 +143,7 @@ io.on('connection', function (socket)
 /**
  * Lancement du serveur en écoutant les connexions arrivant sur le port 3000
  */
-server.listen(3000, function () 
-{
+server.listen(3000, function () {
     console.log('Server is listening on *:3000');
 });
 
