@@ -1,9 +1,9 @@
 // CLIENT SIDE
 
 // BLOB
-var allBlobsData = [];
-var blob;
-var user;
+var allBlobsData = []; // OTHER BLOBS
+var blob; // ME
+//var user;
 var color;
 
 var go = false;
@@ -13,6 +13,9 @@ var go = false;
 var socket = io();
 
 function setup() {
+
+    createCanvas(1000, 1000);
+
     /**
     * Connexion de l'utilisateur
     * Uniquement si le username n'est pas vide et n'existe pas encore
@@ -20,7 +23,7 @@ function setup() {
     $('#login form').submit(function (e) {
         e.preventDefault(); // On évite le recharchement de la page lors de la validation du formulaire
         // On crée notre objet JSON correspondant à notre message
-        user =
+        var user =
         {
             username: $('#login input').val().trim()
         };
@@ -30,6 +33,8 @@ function setup() {
             socket.emit('user-login', user, function (success) {
                 if (success) {
                     go = true;
+                    color = color(random(255), random(255), random(255));
+                    blob = new Blob(socket.id, user.username, color, random(width), random(height));
                     $('body').removeAttr('id'); // Cache formulaire de connexion
                     $('#chat input').focus(); // Focus sur le champ du message
                 }
@@ -38,11 +43,6 @@ function setup() {
     });
 
     if (go) {
-        createCanvas(600, 600);
-
-        color = color(random(255), random(255), random(255));
-        blob = new Blob(socket.id, color, random(width), random(height));
-
         // Make a little object with  and y
         var data =
         {
@@ -58,8 +58,6 @@ function setup() {
             allBlobsData = data;
         });
     }
-
-
 }
 
 function draw() {
@@ -78,18 +76,13 @@ function draw() {
             text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y + 10);
         }
     }
+}
 
+function mouseDragged(){
+    blob.update(mouseX, mouseY);
     blob.show();
-
-    if (mouseIsPressed) {
-        blob.update();
-    }
-
     var data =
     {
-        id: blob.id,
-        username: blob.username,
-        color: blob.color,
         x: blob.pos.x,
         y: blob.pos.y,
     };

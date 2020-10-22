@@ -1,14 +1,14 @@
 
-function Blob(id, color, x, y) {
+function Blob(id, username, color, x, y) {
   this.id = id;
-  //this.username = username;
+  this.username = username;
   this.color = color;
   this.x = x;
   this.y = y;
 
-  this.update = function () {
-    this.x = mouseX;
-    this.y = mouseY;
+  this.update = function (newX, newY) {
+    this.x = newX;
+    this.y = newY;
   };
 
   this.show = function () {

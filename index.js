@@ -21,9 +21,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 var blobsData = []; // list of data for blobs
 
 // construction function
-function Blob(id, color, x, y) {
+function Blob(id, username, color, x, y) 
+{
     this.id = id;
-    //this.username = username;
+    this.username = username;
     this.color = color;
     this.x = x;
     this.y = y;
@@ -44,6 +45,7 @@ io.on('connection', function (socket) {
      * Utilisateur connecté à la socket
      */
     var loggedBlob; // DATA NOT OBJECT
+    var blob;
 
     /**
     * Log de connexion d'un utilisateur (avant login)
@@ -90,8 +92,8 @@ io.on('connection', function (socket) {
 
     socket.on('start', function (data) {
         console.log(data.id + ' ' + ' ' + data.x + ' ' + data.y);
-        var blob = new Blob(data.id, data.color, data.x, data.y);
-        allBlobsData.push(blob);
+        blob = new Blob(data.id, loggedBlob.username, data.color, data.x, data.y);
+        blobsData.push(blob);
     });
 
     /**
@@ -99,15 +101,15 @@ io.on('connection', function (socket) {
      */
     socket.on('update', function (data) {
         //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
-        var blob;
+        var blob2;
         for (var i = 0; i < blobsData.length; i++) {
             if (socket.id == blobsData[i].id) {
-                blob = blobsData[i];
+                blob2 = blobsData[i];
             }
         }
 
-        blob.x = data.x;
-        blob.y = data.y;
+        blob2.x = data.x;
+        blob2.y = data.y;
     });
 
     /**
@@ -127,7 +129,7 @@ io.on('connection', function (socket) {
             socket.broadcast.emit('service-message', serviceMessage);
 
             // Suppression de la liste des connectés
-            var userIndex = blobsData.indexOf(loggedBlob);
+            var userIndex = blobsData.indexOf(blob);
             if (userIndex !== -1) {
                 blobsData.splice(userIndex, 1);
             }
