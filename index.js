@@ -101,15 +101,13 @@ io.on('connection', function (socket) {
      */
     socket.on('update', function (data) {
         //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
-        var blob2;
+        //var blob2;
         for (var i = 0; i < blobsData.length; i++) {
-            if (socket.id == blobsData[i].id) {
-                blob2 = blobsData[i];
+            if (data.id == blobsData[i].id) {
+                blobsData[i] = data.x;
+                blobsData[i] = data.y;
             }
         }
-
-        blob2.x = data.x;
-        blob2.y = data.y;
     });
 
     /**
