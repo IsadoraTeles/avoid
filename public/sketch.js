@@ -83,8 +83,8 @@ function mouseDragged(){
     blob.show();
     var data =
     {
-        x: blob.pos.x,
-        y: blob.pos.y,
+        x: blob.x,
+        y: blob.y,
     };
 
     socket.emit('update', data);
