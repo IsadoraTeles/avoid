@@ -4,7 +4,7 @@
 var allBlobsData = []; // OTHER BLOBS
 var blob; // ME
 //var user;
-var color;
+var myColor;
 
 var go = false;
 
@@ -15,6 +15,12 @@ var socket = io();
 function setup() {
 
     createCanvas(1000, 1000);
+
+    // ** 1
+    socket.on('heartbeat', function (blobsData) {
+        allBlobsData = blobsData;
+        print("blobs : " + blobsData.length);
+    });
 
     /**
     * Connexion de l'utilisateur
@@ -33,8 +39,8 @@ function setup() {
             socket.emit('user-login', user, function (success) {
                 if (success) {
                     go = true;
-                    color = color(random(255), random(255), random(255));
-                    blob = new Blob(socket.id, user.username, color, random(width), random(height));
+                    myColor = color(random(50, 255), random(50, 255), random(50, 255));
+                    blob = new Blob (socket.id, user.username, myColor, random(width), random(height));
                     $('body').removeAttr('id'); // Cache formulaire de connexion
                     $('#chat input').focus(); // Focus sur le champ du message
                 }
@@ -42,21 +48,30 @@ function setup() {
         }
     });
 
+    /**
+     * Connexion d'un nouvel utilisateur
+     */
+    socket.on('user-login', function (blobName) {
+        console.log('a user connected : ', blobName);                 
+        setTimeout(function () {
+        $('#users li.new').removeClass('new');
+        }, 1000);
+    });
+
+    // ** 2
     if (go) {
         // Make a little object with  and y
         var data =
         {
             id: blob.id,
+            username: blob.username,
             color: blob.color,
             x: blob.pos.x,
-            y: blob.pos.y,
+            y: blob.pos.y
         };
 
         socket.emit('start', data);
-
-        socket.on('heartbeat', function (data) {
-            allBlobsData = data;
-        });
+        go = false;
     }
 }
 
@@ -91,6 +106,9 @@ function mouseDragged(){
     socket.emit('update', data);
 }
 
+socket.on('user-logout', function (user) {
+    print("user " + user + " has disconnected");
+  });
 
 
 
