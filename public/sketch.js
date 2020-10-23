@@ -3,7 +3,7 @@
 // BLOB
 var allBlobsData = []; // OTHER BLOBS
 var blob; // ME
-//var user;
+var name;
 var myColor;
 
 var go = false;
@@ -19,7 +19,9 @@ function setup() {
     // ** 1
     socket.on('heartbeat', function (blobsData) {
         allBlobsData = blobsData;
-        print("blobs : " + blobsData.length);
+        //print("blobs received: " + blobsData.length);
+        //print("blobs here on client : " + allBlobsData.length);
+
     });
 
     /**
@@ -28,19 +30,24 @@ function setup() {
     */
     $('#login form').submit(function (e) {
         e.preventDefault(); // On évite le recharchement de la page lors de la validation du formulaire
-        // On crée notre objet JSON correspondant à notre message
-        var user =
-        {
-            username: $('#login input').val().trim()
-        };
-
-        if (user.username.length > 0) {
+        name = $('#login input').val().trim();
+        print(name);
+        if (name.length > 0) {
+            print(name);
+            myColor = color(random(50, 255), random(50, 255), random(50, 255));
+            blob = new Blob(socket.id, name, myColor, random(width), random(height));
+            var user =
+            {
+                id: blob.id,
+                username: blob.username,
+                mycolor: myColor,
+                x: blob.x,
+                y: blob.y
+            };
             // Si le champ de connexion n'est pas vide
             socket.emit('user-login', user, function (success) {
                 if (success) {
-                    go = true;
-                    myColor = color(random(50, 255), random(50, 255), random(50, 255));
-                    blob = new Blob (socket.id, user.username, myColor, random(width), random(height));
+                    print("SUCCES : " + user.username);
                     $('body').removeAttr('id'); // Cache formulaire de connexion
                     $('#chat input').focus(); // Focus sur le champ du message
                 }
@@ -52,48 +59,35 @@ function setup() {
      * Connexion d'un nouvel utilisateur
      */
     socket.on('user-login', function (blobName) {
-        console.log('a user connected : ', blobName);                 
+        console.log('a user connected CLIENT : ', blobName);
         setTimeout(function () {
-        $('#users li.new').removeClass('new');
+            $('#users li.new').removeClass('new');
         }, 1000);
     });
 
-    // ** 2
-    if (go) {
-        // Make a little object with  and y
-        var data =
-        {
-            id: blob.id,
-            username: blob.username,
-            color: blob.color,
-            x: blob.pos.x,
-            y: blob.pos.y
-        };
-
-        socket.emit('start', data);
-        go = false;
-    }
 }
 
 function draw() {
     //background(0);
 
     for (var i = allBlobsData.length - 1; i >= 0; i--) {
-        var id = allBlobsData[i].id;
+        //var id = allBlobsData[i].id;
 
-        if (id.substring(2, id.length) !== socket.id) {
-            fill(allBlobsData[i].color);
+        if (allBlobsData[i].id !== socket.id) {
+            var c = color(allBlobsData[i].myColor)
+            fill(c);
             ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
+            print("color " + c);
 
             fill(255);
             textAlign(CENTER);
             textSize(4);
-            text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y + 10);
+            text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
         }
     }
 }
 
-function mouseDragged(){
+function mouseDragged() {
     blob.update(mouseX, mouseY);
     blob.show();
     var data =
@@ -104,11 +98,14 @@ function mouseDragged(){
     };
 
     socket.emit('update', data);
+    print("blobs here on client : " + allBlobsData.length);
+
 }
 
 socket.on('user-logout', function (user) {
     print("user " + user + " has disconnected");
-  });
+
+});
 
 
 
