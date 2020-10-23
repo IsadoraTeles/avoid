@@ -61,7 +61,7 @@ function setup() {
 }
 
 function draw() {
-    background(0);
+    //background(0);
 
     for (var i = allBlobsData.length - 1; i >= 0; i--) {
         var id = allBlobsData[i].id;
