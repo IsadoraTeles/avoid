@@ -13,11 +13,7 @@ var go = false;
 var socket = io();
 
 // ** 1
-socket.on('heartbeat', function (blobsData) {
-    allBlobsData = blobsData;
-    print("blobs received: " + blobsData.length);
-    //print("blobs here on client : " + allBlobsData.length);
-});
+
 
 function setup() {
 
@@ -69,18 +65,36 @@ function setup() {
 function draw() {
     //background(0);
 
-    socket.on('newDrawing', function (newData) {
-        //allBlobsData[newData.index].x = newData.posX;
-        //allBlobsData[newData.index].x = newData.posY;
-        fill(255, 255, 0);
-        ellipse(newData.posX, newData.posY, 10, 10);
+    //socket.on('newDrawing', function (newData) {
+    //allBlobsData[newData.index].x = newData.posX;
+    //allBlobsData[newData.index].x = newData.posY;
+    //fill(255, 255, 0);
+    //ellipse(newData.posX, newData.posY, 10, 10);
+
+    // for (var i = 0; i < allBlobsData.length; i++) {
+    //     //var ind = newData.index;
+
+    //     //if (allBlobsData[i].id !== socket.id) {
+    //     //var c = allBlobsData[i].myColor[0];
+    //     //print("color " + c);
+    //     fill(255, 255, 0);
+    //     ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
 
 
-        //fill(255);
-        //textAlign(CENTER);
-        //textSize(4);
-        //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
-    });
+    //     //fill(255);
+    //     //textAlign(CENTER);
+    //     //textSize(4);
+    //     //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
+    //     //}
+    //     //else { blob.show() };
+
+    // }
+
+    //fill(255);
+    //textAlign(CENTER);
+    //textSize(4);
+    //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
+    //});
 
     // for (var i = 0; i < allBlobsData.length; i++) {
     //     //var id = allBlobsData[i].id;
@@ -99,11 +113,35 @@ function draw() {
     //     }
     // }
     //print("blobs here on client : " + allBlobsData.length);
+
+    socket.on('heartbeat', function (blobsData) {
+        allBlobsData = blobsData;
+        print("blobs received: " + blobsData.length);
+        for (var i = 0; i < allBlobsData.length; i++) {
+            //var ind = newData.index;
+
+            //if (allBlobsData[i].id !== socket.id) {
+            //var c = allBlobsData[i].myColor[0];
+            //print("color " + c);
+            fill(255, 255, 0);
+            ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
+
+
+            //fill(255);
+            //textAlign(CENTER);
+            //textSize(4);
+            //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
+            //}
+            //else { blob.show() };
+
+        }
+        //print("blobs here on client : " + allBlobsData.length);
+    });
 }
 
 function mouseDragged() {
     blob.update(mouseX, mouseY);
-    blob.show();
+    //blob.show();
     var data =
     {
         id: blob.id,

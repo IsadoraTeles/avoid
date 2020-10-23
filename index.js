@@ -29,12 +29,12 @@ function Blob(id, username, mycolor, x, y) {
     this.y = y;
 }
 
-// setInterval(heartbeat, 33);
+setInterval(heartbeat, 15);
 
 // // ** 1
-// function heartbeat() {
-//     io.sockets.emit('heartbeat', blobsData); // message with array of data
-// }
+function heartbeat() {
+    io.sockets.emit('heartbeat', blobsData); // message with array of data
+}
 
 /*******************************/
 
@@ -100,7 +100,7 @@ io.on('connection', function (socket) {
             posY: data.y
         }
 
-        io.sockets.emit('heartbeat', blobsData); // message with array of data
+        //io.sockets.emit('heartbeat', blobsData); // message with array of data
         io.sockets.emit('newDrawing', newData); // message with array of data
 
     });
