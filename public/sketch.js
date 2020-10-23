@@ -12,17 +12,16 @@ var go = false;
 /*global io*/
 var socket = io();
 
+// ** 1
+socket.on('heartbeat', function (blobsData) {
+    allBlobsData = blobsData;
+    print("blobs received: " + blobsData.length);
+    //print("blobs here on client : " + allBlobsData.length);
+});
+
 function setup() {
 
     createCanvas(1000, 1000);
-
-    // ** 1
-    socket.on('heartbeat', function (blobsData) {
-        allBlobsData = blobsData;
-        //print("blobs received: " + blobsData.length);
-        //print("blobs here on client : " + allBlobsData.length);
-
-    });
 
     /**
     * Connexion de l'utilisateur
@@ -34,7 +33,7 @@ function setup() {
         print(name);
         if (name.length > 0) {
             print(name);
-            myColor = color(random(50, 255), random(50, 255), random(50, 255));
+            myColor = [random(50, 255), random(50, 255), random(50, 255)];
             blob = new Blob(socket.id, name, myColor, random(width), random(height));
             var user =
             {
@@ -70,21 +69,36 @@ function setup() {
 function draw() {
     //background(0);
 
-    for (var i = allBlobsData.length - 1; i >= 0; i--) {
-        //var id = allBlobsData[i].id;
+    socket.on('newDrawing', function (newData) {
+        //allBlobsData[newData.index].x = newData.posX;
+        //allBlobsData[newData.index].x = newData.posY;
+        fill(255, 255, 0);
+        ellipse(newData.posX, newData.posY, 10, 10);
 
-        if (allBlobsData[i].id !== socket.id) {
-            var c = color(allBlobsData[i].myColor)
-            fill(c);
-            ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
-            print("color " + c);
 
-            fill(255);
-            textAlign(CENTER);
-            textSize(4);
-            text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
-        }
-    }
+        //fill(255);
+        //textAlign(CENTER);
+        //textSize(4);
+        //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
+    });
+
+    // for (var i = 0; i < allBlobsData.length; i++) {
+    //     //var id = allBlobsData[i].id;
+
+    //     if (allBlobsData[i].id !== socket.id) {
+    //         var c = allBlobsData[i].myColor[0];
+    //         print("color " + c);
+    //         fill(255, 255, 0);
+    //         ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
+
+
+    //         fill(255);
+    //         textAlign(CENTER);
+    //         textSize(4);
+    //         text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
+    //     }
+    // }
+    //print("blobs here on client : " + allBlobsData.length);
 }
 
 function mouseDragged() {
@@ -96,11 +110,19 @@ function mouseDragged() {
         x: blob.x,
         y: blob.y
     };
-
     socket.emit('update', data);
-    print("blobs here on client : " + allBlobsData.length);
-
 }
+
+// function sendmouse(xpos, ypos) {
+//     var data =
+//     {
+//         id: blob.id,
+//         x: xpos,
+//         y: ypos
+//     };
+
+//     socket.emit('update', data);
+// }
 
 socket.on('user-logout', function (user) {
     print("user " + user + " has disconnected");

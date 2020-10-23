@@ -29,12 +29,12 @@ function Blob(id, username, mycolor, x, y) {
     this.y = y;
 }
 
-setInterval(heartbeat, 33);
+// setInterval(heartbeat, 33);
 
-// ** 1
-function heartbeat() {
-    io.sockets.emit('heartbeat', blobsData); // message with array of data
-}
+// // ** 1
+// function heartbeat() {
+//     io.sockets.emit('heartbeat', blobsData); // message with array of data
+// }
 
 /*******************************/
 
@@ -83,16 +83,27 @@ io.on('connection', function (socket) {
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
      */
     socket.on('update', function (data) {
-        console.log("socket id : " + socket.id + " data ID " + data.id + " " + data.x + " " + data.y);
-        //var blob2;
+        //console.log("socket id : " + socket.id + " data ID " + data.id + " " + data.x + " " + data.y);
+        var index;
         for (var i = 0; i < blobsData.length; i++) {
             if (socket.id == blobsData[i].id) {
+                console.log("GOTITTTT " + data.x);
+                index = i;
                 blobsData[i].x = data.x;
                 blobsData[i].y = data.y;
             }
         }
 
-    });;
+        var newData = {
+            index: index,
+            posX: data.x,
+            posY: data.y
+        }
+
+        io.sockets.emit('heartbeat', blobsData); // message with array of data
+        io.sockets.emit('newDrawing', newData); // message with array of data
+
+    });
 
     /**
     * Déconnexion d'un utilisateur : broadcast d'un 'service-message'
