@@ -76,19 +76,19 @@ io.on('connection', function (socket) {
     /**
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
      */
-    socket.on('mouse', 
-        function(data) {
+    socket.on('mouse',
+        function (data) {
             // Data comes in as whatever was sent, including objects
             console.log("Received: 'mouse' " + data.x + " " + data.y);
-          
+
             // Send it to all other clients
             socket.broadcast.emit('mouse', data);
-            
+
             // This is a way to send to everyone including sender
             // io.sockets.emit('message', "this goes to everyone");
-    
-          }
-    });
+
+
+        });
 
     /**
     * Déconnexion d'un utilisateur : broadcast d'un 'service-message'
