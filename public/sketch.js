@@ -86,19 +86,17 @@ function draw() {
 
       blob.show();
 
-      if (mouseIsPressed) {
-        blob.update();
-      }
-
-      var data = {
-        x: blob.x,
-        y: blob.y,
-      };
-      socket.emit('update', data);
+      
 }
 
 function mouseDragged() {
-    
+    blob.update();
+      
+    var data = {
+        x: blob.x,
+        y: blob.y,
+    };
+    socket.emit('update', data);
 }
 
 
