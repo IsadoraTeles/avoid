@@ -29,7 +29,7 @@ function Blob(id, username, mycolor, x, y) {
     this.y = y;
 }
 
-setInterval(heartbeat, 15);
+setInterval(heartbeat, 33);
 
 // // ** 1
 function heartbeat() {
