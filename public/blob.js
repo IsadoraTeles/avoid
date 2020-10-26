@@ -2,7 +2,7 @@
 function Blob(id, username, color, x, y) {
   this.id = id;
   this.username = username;
-  this.color = color;
+  this.mycolor = color;
   this.x = x;
   this.y = y;
 

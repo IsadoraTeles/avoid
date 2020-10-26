@@ -66,7 +66,7 @@ function setup() {
     function(data) {
       console.log("Got: " + data.x + " " + data.y);
       // Draw a blue circle
-      fill(0,0,255);
+      fill(data.color);
       noStroke();
       ellipse(data.x, data.y, 20, 20);
     }
@@ -75,35 +75,35 @@ function setup() {
 }
 
 function draw() {
-    
+}
 
-    }
-
-    function mouseDragged() {
-        blob.update(mouseX, mouseY);
-        blob.show();
-        sendmouse(blob.x,blob.y);
-    }
+function mouseDragged() {
+    blob.update(mouseX, mouseY);
+    noStroke();
+    blob.show();
+    sendmouse(blob.x,blob.y, blob.mycolor);
+}
 
     // Function for sending to the socket
-function sendmouse(xpos, ypos) {
+function sendmouse(xpos, ypos, color) {
     // We are sending!
     console.log("sendmouse: " + xpos + " " + ypos);
     
     // Make a little object with  and y
     var data = {
       x: xpos,
-      y: ypos
+      y: ypos,
+      c: color
     };
   
     // Send that object to the socket
     socket.emit('mouse',data);
-  }
+}
 
-    socket.on('user-logout', function (user) {
-        print("user " + user + " has disconnected");
+socket.on('user-logout', function (user) {
+    print("user " + user + " has disconnected");
 
-    });
+});
 
 
 
