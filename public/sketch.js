@@ -92,6 +92,12 @@ function draw() {
             blob.update();
         }
 
+
+    }
+
+    function mouseDragged() {
+        blob.update();
+
         var data = {
             x: blob.x,
             y: blob.y,
@@ -99,17 +105,11 @@ function draw() {
         socket.emit('update', data);
     }
 
-}
 
-function mouseDragged() {
+    socket.on('user-logout', function (user) {
+        print("user " + user + " has disconnected");
 
-}
-
-
-socket.on('user-logout', function (user) {
-    print("user " + user + " has disconnected");
-
-});
+    });
 
 
 
