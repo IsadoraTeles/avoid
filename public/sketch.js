@@ -61,35 +61,36 @@ function setup() {
         }, 1000);
     });
 
-    socket.on('heartbeat', function (blobsData) {
-        allBlobsData = blobsData;
-    });
+    // socket.on('heartbeat', function (blobsData) {
+    //     allBlobsData = blobsData;
+    // });
 
 }
 
 function draw() {
-    for (var i = allBlobsData.length - 1; i >= 0; i--) {
-        var id = allBlobsData[i].id;
-        if (id.substring(2, id.length) !== socket.id) {
-            fill(0, 0, 255);
-            ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
+    
 
-            fill(255);
-            textAlign(CENTER);
-            textSize(4);
-            text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y, 20);
+    socket.on('heartbeat', function (blobsData) {
+        allBlobsData = blobsData;
+        for (var i = allBlobsData.length - 1; i >= 0; i--) {
+            var id = allBlobsData[i].id;
+            if (id.substring(2, id.length) !== socket.id) {
+                fill(0, 0, 255);
+                ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
+    
+                fill(0);
+                textAlign(CENTER);
+                textSize(20);
+                text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y, 20);
+            }
         }
-        // blobs[i].show();
-        // if (blob.eats(blobs[i])) {
-        //   blobs.splice(i, 1);
-        // }
-    }
+    });
 
-   
 
     }
 
     function mouseDragged() {
+        blob.show();
         blob.update();
 
         var data = {

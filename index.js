@@ -94,7 +94,6 @@ io.on('connection', function (socket) {
 
         blobUpdate.x = data.x;
         blobUpdate.y = data.y;
-
     });
 
     /**
