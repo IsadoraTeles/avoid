@@ -85,13 +85,7 @@ function draw() {
         // }
     }
 
-    if (go) {
-        blob.show();
-
-        if (mouseIsPressed) {
-            blob.update();
-        }
-
+   
 
     }
 
