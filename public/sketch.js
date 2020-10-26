@@ -45,6 +45,7 @@ function setup() {
                     print("SUCCES : " + user.username);
                     $('body').removeAttr('id'); // Cache formulaire de connexion
                     $('#chat input').focus(); // Focus sur le champ du message
+                    go = true;
                 }
             });
         }
@@ -60,7 +61,7 @@ function setup() {
         }, 1000);
     });
 
-    socket.on('heartbeat', function(blobsData){
+    socket.on('heartbeat', function (blobsData) {
         allBlobsData = blobsData;
     });
 
@@ -70,35 +71,38 @@ function draw() {
     for (var i = allBlobsData.length - 1; i >= 0; i--) {
         var id = allBlobsData[i].id;
         if (id.substring(2, id.length) !== socket.id) {
-          fill(0, 0, 255);
-          ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
-    
-          fill(255);
-          textAlign(CENTER);
-          textSize(4);
-          text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y, 20);
+            fill(0, 0, 255);
+            ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
+
+            fill(255);
+            textAlign(CENTER);
+            textSize(4);
+            text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y, 20);
         }
         // blobs[i].show();
         // if (blob.eats(blobs[i])) {
         //   blobs.splice(i, 1);
         // }
-      }
+    }
 
-      blob.show();
+    if (go) {
+        blob.show();
 
-      if (mouseIsPressed) {
-        blob.update();
-      }
+        if (mouseIsPressed) {
+            blob.update();
+        }
 
-      var data = {
-        x: blob.x,
-        y: blob.y,
-      };
-      socket.emit('update', data);
+        var data = {
+            x: blob.x,
+            y: blob.y,
+        };
+        socket.emit('update', data);
+    }
+
 }
 
 function mouseDragged() {
-    
+
 }
 
 
