@@ -29,12 +29,6 @@ function Blob(id, username, mycolor, x, y) {
     this.y = y;
 }
 
-setInterval(heartbeat, 33);
-
-// // ** 1
-function heartbeat() {
-    io.sockets.emit('heartbeat', blobsData); // message with array of data
-}
 
 /*******************************/
 
@@ -82,18 +76,18 @@ io.on('connection', function (socket) {
     /**
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
      */
-    socket.on('update', function (data) {
-        //console.log("socket id : " + socket.id + " data ID " + data.id + " " + data.x + " " + data.y);
-        var blobUpdate;
-        for (var i = 0; i < blobsData.length; i++) {
-            if (socket.id == blobsData[i].id) {
-                console.log("GOTITTTT " + data.x);
-                blobUpdate = blobsData[i];
-            }
-        }
-
-        blobUpdate.x = data.x;
-        blobUpdate.y = data.y;
+    socket.on('mouse', 
+        function(data) {
+            // Data comes in as whatever was sent, including objects
+            console.log("Received: 'mouse' " + data.x + " " + data.y);
+          
+            // Send it to all other clients
+            socket.broadcast.emit('mouse', data);
+            
+            // This is a way to send to everyone including sender
+            // io.sockets.emit('message', "this goes to everyone");
+    
+          }
     });
 
     /**

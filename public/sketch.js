@@ -61,45 +61,44 @@ function setup() {
         }, 1000);
     });
 
-    // socket.on('heartbeat', function (blobsData) {
-    //     allBlobsData = blobsData;
-    // });
+    socket.on('mouse',
+    // When we receive data
+    function(data) {
+      console.log("Got: " + data.x + " " + data.y);
+      // Draw a blue circle
+      fill(0,0,255);
+      noStroke();
+      ellipse(data.x, data.y, 20, 20);
+    }
+  );
 
 }
 
 function draw() {
     
 
-    socket.on('heartbeat', function (blobsData) {
-        allBlobsData = blobsData;
-        for (var i = allBlobsData.length - 1; i >= 0; i--) {
-            var id = allBlobsData[i].id;
-            if (id.substring(2, id.length) !== socket.id) {
-                fill(0, 0, 255);
-                ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
-    
-                fill(0);
-                textAlign(CENTER);
-                textSize(20);
-                text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y, 20);
-            }
-        }
-    });
-
-
     }
 
     function mouseDragged() {
+        blob.update(mouseX, mouseY);
         blob.show();
-        blob.update();
-
-        var data = {
-            x: blob.x,
-            y: blob.y,
-        };
-        socket.emit('update', data);
+        sendmouse(blob.x,blob.y);
     }
 
+    // Function for sending to the socket
+function sendmouse(xpos, ypos) {
+    // We are sending!
+    console.log("sendmouse: " + xpos + " " + ypos);
+    
+    // Make a little object with  and y
+    var data = {
+      x: xpos,
+      y: ypos
+    };
+  
+    // Send that object to the socket
+    socket.emit('mouse',data);
+  }
 
     socket.on('user-logout', function (user) {
         print("user " + user + " has disconnected");
