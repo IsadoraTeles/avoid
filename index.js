@@ -84,24 +84,16 @@ io.on('connection', function (socket) {
      */
     socket.on('update', function (data) {
         //console.log("socket id : " + socket.id + " data ID " + data.id + " " + data.x + " " + data.y);
-        var index;
+        var blobUpdate;
         for (var i = 0; i < blobsData.length; i++) {
             if (socket.id == blobsData[i].id) {
                 console.log("GOTITTTT " + data.x);
-                index = i;
-                blobsData[i].x = data.x;
-                blobsData[i].y = data.y;
+                blobUpdate = blobsData[i];
             }
         }
 
-        var newData = {
-            index: index,
-            posX: data.x,
-            posY: data.y
-        }
-
-        //io.sockets.emit('heartbeat', blobsData); // message with array of data
-        io.sockets.emit('newDrawing', newData); // message with array of data
+        blobUpdate.x = data.x;
+        blobUpdate.y = data.y;
 
     });
 

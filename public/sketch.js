@@ -60,107 +60,47 @@ function setup() {
         }, 1000);
     });
 
+    socket.on('heartbeat', function(blobsData){
+        allBlobsData = blobsData;
+    });
+
 }
 
 function draw() {
-    //background(0);
-
-    //socket.on('newDrawing', function (newData) {
-    //allBlobsData[newData.index].x = newData.posX;
-    //allBlobsData[newData.index].x = newData.posY;
-    //fill(255, 255, 0);
-    //ellipse(newData.posX, newData.posY, 10, 10);
-
-    // for (var i = 0; i < allBlobsData.length; i++) {
-    //     //var ind = newData.index;
-
-    //     //if (allBlobsData[i].id !== socket.id) {
-    //     //var c = allBlobsData[i].myColor[0];
-    //     //print("color " + c);
-    //     fill(255, 255, 0);
-    //     ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
-
-
-    //     //fill(255);
-    //     //textAlign(CENTER);
-    //     //textSize(4);
-    //     //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
-    //     //}
-    //     //else { blob.show() };
-
-    // }
-
-    //fill(255);
-    //textAlign(CENTER);
-    //textSize(4);
-    //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
-    //});
-
-    // for (var i = 0; i < allBlobsData.length; i++) {
-    //     //var id = allBlobsData[i].id;
-
-    //     if (allBlobsData[i].id !== socket.id) {
-    //         var c = allBlobsData[i].myColor[0];
-    //         print("color " + c);
-    //         fill(255, 255, 0);
-    //         ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
-
-
-    //         fill(255);
-    //         textAlign(CENTER);
-    //         textSize(4);
-    //         text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
-    //     }
-    // }
-    //print("blobs here on client : " + allBlobsData.length);
-
-    socket.on('heartbeat', function (blobsData) {
-        allBlobsData = blobsData;
-        print("blobs received: " + blobsData.length);
-        for (var i = 0; i < allBlobsData.length; i++) {
-            //var ind = newData.index;
-
-            //if (allBlobsData[i].id !== socket.id) {
-            //var c = allBlobsData[i].myColor[0];
-            //print("color " + c);
-            fill(255, 255, 0);
-            ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
-
-
-            //fill(255);
-            //textAlign(CENTER);
-            //textSize(4);
-            //text(allBlobsData[i].username, allBlobsData[i].x, allBlobsData[i].y + 10);
-            //}
-            //else { blob.show() };
-
+    for (var i = allBlobsData.length - 1; i >= 0; i--) {
+        var id = allBlobsData[i].id;
+        if (id.substring(2, id.length) !== socket.id) {
+          fill(0, 0, 255);
+          ellipse(allBlobsData[i].x, allBlobsData[i].y, 10, 10);
+    
+          fill(255);
+          textAlign(CENTER);
+          textSize(4);
+          text(allBlobsData[i].id, allBlobsData[i].x, allBlobsData[i].y, 20);
         }
-        //print("blobs here on client : " + allBlobsData.length);
-    });
+        // blobs[i].show();
+        // if (blob.eats(blobs[i])) {
+        //   blobs.splice(i, 1);
+        // }
+      }
+
+      blob.show();
+
+      if (mouseIsPressed) {
+        blob.update();
+      }
+
+      var data = {
+        x: blob.x,
+        y: blob.y,
+      };
+      socket.emit('update', data);
 }
 
 function mouseDragged() {
-    blob.update(mouseX, mouseY);
-    //blob.show();
-    var data =
-    {
-        id: blob.id,
-        x: blob.x,
-        y: blob.y
-    };
-    socket.emit('update', data);
+    
 }
 
-// function sendmouse(xpos, ypos) {
-//     var data =
-//     {
-//         id: blob.id,
-//         x: xpos,
-//         y: ypos
-//     };
-
-//     socket.emit('update', data);
-// }
 
 socket.on('user-logout', function (user) {
     print("user " + user + " has disconnected");

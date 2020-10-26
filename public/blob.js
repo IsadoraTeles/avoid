@@ -6,9 +6,9 @@ function Blob(id, username, color, x, y) {
   this.x = x;
   this.y = y;
 
-  this.update = function (newX, newY) {
-    this.x = newX;
-    this.y = newY;
+  this.update = function () {
+    this.x = mouseX;
+    this.y = mouseY;
   };
 
   this.show = function () {
