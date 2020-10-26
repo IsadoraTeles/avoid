@@ -5,6 +5,7 @@ var allBlobsData = []; // OTHER BLOBS
 var blob; // ME
 var name;
 var myColor;
+var b = false;
 
 var go = false;
 
@@ -62,15 +63,22 @@ function setup() {
     });
 
     socket.on('mouse',
-    // When we receive data
-    function(data) {
-      console.log("Got: " + data.x + " " + data.y);
-      // Draw a blue circle
-      fill(data.color);
-      noStroke();
-      ellipse(data.x, data.y, 20, 20);
-    }
-  );
+        // When we receive data
+        function (data) {
+            console.log("Got: " + data.mycolor + " " + data.y);
+            // Draw a blue circle
+            fill(color(data.mycolor));
+            noStroke();
+            ellipse(data.x, data.y, 20, 20);
+
+            b = blob.bump(data.id, data.x, data.y);
+            if (b) {
+                blob.mycolor = [random(50, 255), random(50, 255), random(50, 255)];
+                b = false;
+            }
+
+        }
+    );
 
 }
 
@@ -78,26 +86,28 @@ function draw() {
 }
 
 function mouseDragged() {
+    sendmouse(blob.x, blob.y, blob.mycolor);
+
     blob.update(mouseX, mouseY);
     noStroke();
     blob.show();
-    sendmouse(blob.x,blob.y, blob.mycolor);
 }
 
-    // Function for sending to the socket
-function sendmouse(xpos, ypos, color) {
+// Function for sending to the socket
+function sendmouse(xpos, ypos, mycolor) {
     // We are sending!
     console.log("sendmouse: " + xpos + " " + ypos);
-    
+
     // Make a little object with  and y
     var data = {
-      x: xpos,
-      y: ypos,
-      c: color
+        id: blob.id,
+        x: xpos,
+        y: ypos,
+        mycolor: mycolor
     };
-  
+
     // Send that object to the socket
-    socket.emit('mouse',data);
+    socket.emit('mouse', data);
 }
 
 socket.on('user-logout', function (user) {
