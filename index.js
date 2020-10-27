@@ -66,7 +66,7 @@ io.on('connection', function (socket) {
             // S'il est bien nouveau
             // Sauvegarde de l'utilisateur et ajout à la liste des connectés
             blobName = user.username;
-
+            //var index = blobsData.length + 1;
             loggedblob = new Blob(user.id, user.username, user.mycolor, user.x, user.y);
             blobsData.push(loggedblob);
             // Emission de 'user-login' et appel du callback
@@ -90,15 +90,13 @@ io.on('connection', function (socket) {
             // This is a way to send to everyone including sender
             // io.sockets.emit('message', "this goes to everyone");
 
-            var tempBlob;
+            // ****** TRY A BETTER SEARCH METHOD HERE OTHERWISE ITS TOO SLOW
             for (var i = 0; i < blobsData.length; i++) {
                 if (data.id == blobsData[i].id) {
-                    tempBlob = blobsData[i];
+                    blobsData[i].x = data.x;
+                    blobsData[i].y = data.y;
                 }
             }
-            tempBlob.x = data.x;
-            tempBlob.y = data.y;
-
         });
 
     /**
