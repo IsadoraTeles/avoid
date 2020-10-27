@@ -30,6 +30,12 @@ function Blob(id, username, mycolor, x, y) {
 }
 
 
+setInterval(heartbeat, 33);
+// SEND LIS OF USERS TO CLIENTS
+function heartbeat() {
+    io.sockets.emit('heartbeat', blobsData);
+}
+
 /*******************************/
 
 io.on('connection', function (socket) {
@@ -60,7 +66,6 @@ io.on('connection', function (socket) {
             // S'il est bien nouveau
             // Sauvegarde de l'utilisateur et ajout à la liste des connectés
             blobName = user.username;
-            console.log(user.username + ' ' + ' ' + user.x + ' ' + user.y);
 
             loggedblob = new Blob(user.id, user.username, user.mycolor, user.x, user.y);
             blobsData.push(loggedblob);
@@ -77,9 +82,7 @@ io.on('connection', function (socket) {
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
      */
     socket.on('mouse',
-        function (data) {
-            // Data comes in as whatever was sent, including objects
-            console.log("Received: 'mouse' " + data.x + " " + data.y);
+        function (data) { // data: id, xpos, ypos, mycolor
 
             // Send it to all other clients
             socket.broadcast.emit('mouse', data);
@@ -87,6 +90,14 @@ io.on('connection', function (socket) {
             // This is a way to send to everyone including sender
             // io.sockets.emit('message', "this goes to everyone");
 
+            var tempBlob;
+            for (var i = 0; i < blobsData.length; i++) {
+                if (data.id == blobsData[i].id) {
+                    tempBlob = blobsData[i];
+                }
+            }
+            tempBlob.x = data.x;
+            tempBlob.y = data.y;
 
         });
 
@@ -104,11 +115,11 @@ io.on('connection', function (socket) {
                     userIndex = i;
                 }
                 if (userIndex !== -1) {
+                    // Suppression de la liste des connectés
                     blobsData.splice(userIndex, 1);
                 }
             }
 
-            // Suppression de la liste des connectés
 
             // Emission d'un 'user-logout' contenant le user
             io.emit('user-logout', blobName);

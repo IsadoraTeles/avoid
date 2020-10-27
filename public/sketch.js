@@ -29,7 +29,7 @@ function setup() {
         name = $('#login input').val().trim();
         print(name);
         if (name.length > 0) {
-            print(name);
+            //print(name);
             myColor = [random(50, 255), random(50, 255), random(50, 255)];
             blob = new Blob(socket.id, name, myColor, random(width), random(height));
             var user =
@@ -64,21 +64,17 @@ function setup() {
 
     socket.on('mouse',
         // When we receive data
-        function (data) {
-            console.log("Got: " + data.mycolor + " " + data.y);
-            // Draw a blue circle
+        function (data) { // data: id, xpos, ypos, mycolor
             fill(color(data.mycolor));
             noStroke();
             ellipse(data.x, data.y, 20, 20);
-
-            b = blob.bump(data.id, data.x, data.y);
-            if (b) {
-                blob.mycolor = [random(50, 255), random(50, 255), random(50, 255)];
-                b = false;
-            }
-
         }
     );
+
+    // update list of clients connected
+    socket.on('heartbeat', function (data) {
+        allBlobsData = data;
+    });
 
 }
 
@@ -112,7 +108,7 @@ function sendmouse(xpos, ypos, mycolor) {
 
 socket.on('user-logout', function (user) {
     print("user " + user + " has disconnected");
-
+    print("blobs : " + allBlobsData.length);
 });
 
 
