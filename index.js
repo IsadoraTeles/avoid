@@ -29,6 +29,13 @@ function Blob(id, username, mycolor, x, y) {
     this.y = y;
 }
 
+function Host(username, mycolor, x, y) {
+    this.username = username;
+    this.myColor = mycolor;
+    this.x = x;
+    this.y = y;
+}
+
 
 setInterval(heartbeat, 33);
 // SEND LIS OF USERS TO CLIENTS
@@ -45,6 +52,7 @@ io.on('connection', function (socket) {
      */
     var blobName; // stock all logged user data
     var loggedblob;
+    var loggedHost;
     /**
     * Log de connexion d'un utilisateur (avant login)
     */
@@ -53,6 +61,31 @@ io.on('connection', function (socket) {
     /**
      * Connexion d'un utilisateur via le formulaire :
      */
+    socket.on('host-login', function (host, callback) {
+        // Vérification que l'utilisateur n'existe pas
+        var userIndex = -1;
+        for (i = 0; i < blobsData.length; i++) {
+            if (blobsData[i].username == host.username) {
+                userIndex = i;
+                console.log('THIS USER EXISTS ! and its the HOST : ' + host.username);
+            }
+        }
+        if (host !== undefined && userIndex === -1) {
+            // S'il est bien nouveau
+            // Sauvegarde de l'utilisateur et ajout à la liste des connectés
+            hostName = host.username;
+            //var index = blobsData.length + 1;
+            loggedHost = new Host(host.username, host.mycolor, host.x, host.y);
+            //blobsData.push(loggedblob);
+            // Emission de 'user-login' et appel du callback
+            io.emit('host-login', hostName);
+            callback(true);
+        }
+        else {
+            callback(false);
+        }
+    });
+
     socket.on('user-login', function (user, callback) {
         // Vérification que l'utilisateur n'existe pas
         var userIndex = -1;
@@ -77,6 +110,14 @@ io.on('connection', function (socket) {
             callback(false);
         }
     });
+
+    socket.on('walker',
+        function (data) { // data: id, xpos, ypos, mycolor
+
+            // Send it to all other clients
+            socket.broadcast.emit('walker', data);
+
+        });
 
     /**
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
@@ -118,9 +159,21 @@ io.on('connection', function (socket) {
                 }
             }
 
+            // ** WHAT IF THE HOST DISCONNECTS ???????
+
 
             // Emission d'un 'user-logout' contenant le user
             io.emit('user-logout', blobName);
+        }
+
+        else if (hostName !== undefined) {
+
+
+            // ** WHAT IF THE HOST DISCONNECTS ???????
+
+
+            // Emission d'un 'user-logout' contenant le user
+            io.emit('host-logout', hostName);
         }
     });
 

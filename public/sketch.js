@@ -8,6 +8,8 @@ var myColor;
 var b = false;
 
 var go = false;
+var isHost = false;
+var isClient = false;
 
 // COMMUNICATION
 /*global io*/
@@ -27,8 +29,29 @@ function setup() {
     $('#login form').submit(function (e) {
         e.preventDefault(); // On évite le recharchement de la page lors de la validation du formulaire
         name = $('#login input').val().trim();
-        print(name);
-        if (name.length > 0) {
+        if (name.length > 0 && name == "host") {
+            print(name);
+            myColor = [255, 0, 0];
+            walker = new Walker();
+            var host =
+            {
+                username: walker.username,
+                mycolor: walker.mycolor,
+                x: walker.x,
+                y: walker.y
+            };
+            // Si le champ de connexion n'est pas vide
+            socket.emit('host-login', host, function (success) {
+                if (success) {
+                    print("SUCCESS HOST : " + host.username);
+                    $('body').removeAttr('id'); // Cache formulaire de connexion
+                    $('#chat input').focus(); // Focus sur le champ du message
+                    isHost = true;
+                }
+            });
+
+        }
+        else if (name.length > 0 && name != "host") {
             //print(name);
             myColor = [random(50, 255), random(50, 255), random(50, 255)];
             blob = new Blob(socket.id, name, myColor, random(width), random(height));
@@ -46,7 +69,7 @@ function setup() {
                     print("SUCCES : " + user.username);
                     $('body').removeAttr('id'); // Cache formulaire de connexion
                     $('#chat input').focus(); // Focus sur le champ du message
-                    go = true;
+                    isClient = true;
                 }
             });
         }
@@ -62,6 +85,13 @@ function setup() {
         }, 1000);
     });
 
+    socket.on('host-login', function (hostName) {
+        console.log('a user connected CLIENT : ', hostName);
+        setTimeout(function () {
+            $('#users li.new').removeClass('new');
+        }, 1000);
+    });
+
     socket.on('mouse',
         // When we receive data
         function (data) { // data: id, xpos, ypos, mycolor
@@ -71,6 +101,19 @@ function setup() {
         }
     );
 
+
+    socket.on('walker',
+        // When we receive data
+        function (data) { // data: id, xpos, ypos, mycolor
+            fill(color(data.mycolor));
+            noStroke();
+            ellipse(data.x, data.y, 20, 20);
+            print("host update");
+        }
+    );
+
+
+
     // update list of clients connected
     socket.on('heartbeat', function (data) {
         allBlobsData = data;
@@ -79,14 +122,21 @@ function setup() {
 }
 
 function draw() {
+    if (isHost) {
+        print("host update");
+        sendwalker(walker.x, walker.y, walker.mycolor);
+        walker.update();
+        walker.show();
+    }
 }
 
 function mouseDragged() {
-    sendmouse(blob.x, blob.y, blob.mycolor);
-
-    blob.update(mouseX, mouseY);
-    noStroke();
-    blob.show();
+    if (isClient) {
+        sendmouse(blob.x, blob.y, blob.mycolor);
+        blob.update(mouseX, mouseY);
+        noStroke();
+        blob.show();
+    }
 }
 
 // Function for sending to the socket
@@ -106,8 +156,29 @@ function sendmouse(xpos, ypos, mycolor) {
     socket.emit('mouse', data);
 }
 
+// Function for sending to the socket
+function sendwalker(xpos, ypos, mycolor) {
+    // We are sending!
+    console.log("sendwalker: " + xpos + " " + ypos);
+
+    // Make a little object with  and y
+    var data = {
+        x: xpos,
+        y: ypos,
+        mycolor: mycolor
+    };
+
+    // Send that object to the socket
+    socket.emit('walker', data);
+}
+
 socket.on('user-logout', function (user) {
     print("user " + user + " has disconnected");
+    print("blobs : " + allBlobsData.length);
+});
+
+socket.on('host-logout', function (user) {
+    print("host " + user + " has disconnected");
     print("blobs : " + allBlobsData.length);
 });
 
