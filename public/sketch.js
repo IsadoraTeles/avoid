@@ -2,6 +2,7 @@
 
 // BLOB
 var allBlobsData = []; // OTHER BLOBS
+var boids = [];
 var blob; // ME
 var name;
 var myColor;
@@ -17,10 +18,16 @@ var socket = io();
 
 // ** 1
 
-
 function setup() {
 
     createCanvas(1000, 1000);
+
+    quadTree = new QuadTree(Infinity, 30, new Rect(0, 0, width, height));
+    this.alignSlider = createSlider(0, 10, 1, 0.1);
+    this.cohesionSlider = createSlider(0, 10, 1, 0.1);
+    this.separationSlider = createSlider(0, 10, 1, 0.1);
+    this.maxForceSlider = createSlider(0, 10, 1, 0.1);
+    this.maxSpeedSlider = createSlider(0, 10, 1, 0.1);
 
     /**
     * Connexion de l'utilisateur
@@ -32,13 +39,14 @@ function setup() {
         if (name.length > 0 && name == "host") {
             print(name);
             myColor = [255, 0, 0];
-            walker = new Walker();
+            //walker = new RandomWalker();
+            boid = new Boid();
             var host =
             {
-                username: walker.username,
-                mycolor: walker.mycolor,
-                x: walker.x,
-                y: walker.y
+                username: boid.username,
+                mycolor: boid.mycolor,
+                x: boid.x,
+                y: boid.y
             };
             // Si le champ de connexion n'est pas vide
             socket.emit('host-login', host, function (success) {
@@ -49,7 +57,6 @@ function setup() {
                     isHost = true;
                 }
             });
-
         }
         else if (name.length > 0 && name != "host") {
             //print(name);
@@ -107,12 +114,10 @@ function setup() {
         function (data) { // data: id, xpos, ypos, mycolor
             fill(color(data.mycolor));
             noStroke();
-            ellipse(data.x, data.y, 20, 20);
+            ellipse(data.x, data.y, 5, 5);
             print("host update");
         }
     );
-
-
 
     // update list of clients connected
     socket.on('heartbeat', function (data) {
@@ -122,12 +127,26 @@ function setup() {
 }
 
 function draw() {
+
+    quadTree.clear();
+    for (const blob of allBlobsData) {
+        quadTree.addItem(blob.x, blob.y, blob);
+    }
+
     if (isHost) {
         print("host update");
-        sendwalker(walker.x, walker.y, walker.mycolor);
-        walker.update();
-        walker.show();
+        //sendwalker(walker.x, walker.y, walker.mycolor);
+        //walker.update();
+        //walker.show();
+        sendwalker(boid.position.x, boid.position.y, boid.mycolor);
+        boid.edges();
+        boid.flock(allBlobsData);
+        boid.update();
+        boid.show();
     }
+
+    quadTree.debugRender();
+
 }
 
 function mouseDragged() {

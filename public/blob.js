@@ -5,10 +5,15 @@ function Blob(id, username, mycolor, x, y) {
   this.mycolor = mycolor;
   this.x = x;
   this.y = y;
+  this.velocity = createVector();
+
 
   this.update = function () {
+    let oldPos = createVector(this.x, this.y);
     this.x = mouseX;
     this.y = mouseY;
+    let newPos = createVector(this.x, this.y);
+    this.velocity = newPos.sub(oldPos);
   };
 
   this.show = function () {
